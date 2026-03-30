@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Osservo · Penso · Mi chiedo – Project Zero</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c16;--sf:#0f1629;--s2:#161d33;--s3:#1e2844;--brd:rgba(255,255,255,.07);--ng:#00ff9d;--nb:#00d4ff;--np:#ff2d95;--nv:#b14aff;--ny:#ffe234;--no:#ff8534;--nc:#00fff0;--nr:#ff4757;--gg:rgba(0,255,157,.08);--gb:rgba(0,212,255,.08);--gp:rgba(255,45,149,.08);--gv:rgba(177,74,255,.08);--gy:rgba(255,226,52,.08);--gr:rgba(255,71,87,.08);--t:#e0e7f1;--td:#7a8baa;--tb:#fff;--rad:20px;--rs:14px}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 20% 20%,rgba(0,255,157,.07),transparent 40%),radial-gradient(circle at 80% 80%,rgba(0,212,255,.06),transparent 40%),radial-gradient(circle at 50% 50%,rgba(177,74,255,.04),transparent 50%),radial-gradient(circle at 90% 20%,rgba(255,45,149,.04),transparent 35%)}
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+
+/* Flash overlay */
+#flash{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;transition:opacity .15s}
+#flash.green{background:radial-gradient(circle,rgba(0,255,157,.2),transparent 70%);opacity:1}
+#flash.red{background:radial-gradient(circle,rgba(255,71,87,.2),transparent 70%);opacity:1}
+
+/* ══ INTRO SCREEN ══ */
+#introScreen{position:relative;z-index:10;max-width:700px;margin:0 auto;padding:60px 20px;text-align:center;animation:fadeIn .8s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+#introScreen h1{font-family:'Fraunces',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;color:var(--tb);line-height:1.15;margin-bottom:16px}
+#introScreen h1 em{font-style:normal;background:linear-gradient(135deg,var(--ng),var(--nb),var(--nv));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#introScreen .intro-sub{color:var(--td);font-size:1rem;line-height:1.7;margin-bottom:30px;max-width:540px;margin-inline:auto}
+.intro-features{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+.intro-feat{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rs);padding:18px 20px;width:160px;text-align:center}
+.intro-feat .feat-icon{font-size:2rem;margin-bottom:8px}
+.intro-feat .feat-title{font-size:.82rem;font-weight:600;color:var(--tb);margin-bottom:4px}
+.intro-feat .feat-desc{font-size:.72rem;color:var(--td);line-height:1.4}
+.intro-topics{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.intro-topic{padding:6px 14px;border-radius:100px;font-size:.75rem;font-weight:600}
+.btn-start{font-family:'Outfit',sans-serif;font-weight:700;border:none;border-radius:16px;padding:18px 48px;cursor:pointer;font-size:1.1rem;color:#080c16;background:linear-gradient(135deg,var(--ng),var(--nb));box-shadow:0 6px 30px rgba(0,255,157,.3);transition:all .3s;display:inline-flex;align-items:center;gap:10px}
+.btn-start:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 40px rgba(0,255,157,.4)}
+.btn-start:active{transform:scale(.97)}
+
+/* ══ MAIN LAYOUT ══ */
+.hdr{position:relative;z-index:10;text-align:center;padding:28px 20px 6px}
+.hdr .badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ng);background:var(--gg);border:1px solid rgba(0,255,157,.15);padding:6px 16px;border-radius:100px;margin-bottom:12px}
+.hdr h1{font-family:'Fraunces',serif;font-size:clamp(1.3rem,4vw,2.2rem);font-weight:700;color:var(--tb);line-height:1.2}
+.hdr h1 em{font-style:normal;background:linear-gradient(135deg,var(--ng),var(--nb),var(--nv));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wrap{position:relative;z-index:10;max-width:880px;margin:12px auto;padding:0 16px 60px}
+.card{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rad);padding:28px;margin-bottom:16px;box-shadow:0 8px 40px rgba(0,0,0,.4);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ng),var(--nb),var(--nv),var(--np));opacity:.6}
+
+/* ══ STEPS ══ */
+.steps{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.sp{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:.72rem;font-weight:600;background:var(--s2);color:var(--td);border:1.5px solid transparent;transition:all .35s;cursor:default}
+.sp.on{border-color:var(--ng);color:var(--ng);background:var(--gg);box-shadow:0 0 12px rgba(0,255,157,.15)}
+.sp.ok{border-color:rgba(0,255,157,.3);color:var(--ng);background:rgba(0,255,157,.06)}
+.sp .n{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:700;background:var(--s3);transition:all .3s}
+.sp.on .n{background:var(--ng);color:var(--bg)}.sp.ok .n{background:var(--ng);color:var(--bg);opacity:.7}
+
+/* ══ SCORE BAR ══ */
+.sbar{display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--s2);border-radius:var(--rs);margin-bottom:14px;font-size:.84rem;border:1px solid var(--brd);flex-wrap:wrap}
+.sbar .lb{color:var(--td)}.sbar .vl{font-weight:700;font-size:1rem}
+.sbar .vl.green{color:var(--ng)}.sbar .vl.yellow{color:var(--ny)}
+.pbar{flex:1;min-width:80px;height:6px;background:var(--s3);border-radius:100px;overflow:hidden}
+.pfill{height:100%;border-radius:100px;transition:width .6s;width:0%;background:linear-gradient(90deg,var(--ng),var(--nb),var(--nv))}
+.streak{display:flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:.78rem;font-weight:600;background:var(--gy);color:var(--ny);border:1px solid rgba(255,226,52,.15);animation:pulse 1s ease infinite}
+.streak.hidden{display:none}
+@keyframes pulse{0%,100%{box-shadow:0 0 4px rgba(255,226,52,.1)}50%{box-shadow:0 0 16px rgba(255,226,52,.3)}}
+
+/* ══ PHASE PIPELINE ══ */
+.pipeline{display:flex;align-items:center;gap:0;margin-bottom:18px;background:var(--s2);border-radius:var(--rs);padding:8px 12px;border:1px solid var(--brd)}
+.pipe-step{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:.78rem;font-weight:600;color:var(--td);transition:all .3s;flex:1;justify-content:center}
+.pipe-step.active{color:var(--tb);background:rgba(255,255,255,.06)}
+.pipe-step.done{color:var(--ng)}
+.pipe-arrow{color:var(--td);font-size:.7rem;margin:0 2px;opacity:.4}
+.pipe-step .pipe-icon{font-size:1.1rem}
+
+/* ══ SCENE ══ */
+.scene{width:100%;border-radius:var(--rs);background:linear-gradient(180deg,var(--s2),var(--s3));border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;min-height:240px;margin-bottom:18px;overflow:hidden;position:relative;padding:16px}
+.scene svg{width:100%;max-width:580px;height:auto;display:block}
+.scene-tag{position:absolute;top:12px;left:14px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:4px 12px;border-radius:8px}
+.tag-elec{color:var(--ny);background:var(--gy);border:1px solid rgba(255,226,52,.15)}
+.tag-force{color:var(--np);background:var(--gp);border:1px solid rgba(255,45,149,.15)}
+.tag-energy{color:var(--no);background:rgba(255,133,52,.08);border:1px solid rgba(255,133,52,.15)}
+.tag-wave{color:var(--nc);background:rgba(0,255,240,.08);border:1px solid rgba(0,255,240,.15)}
+.tag-osc{color:var(--nb);background:var(--gb);border:1px solid rgba(0,212,255,.15)}
+.tag-optic{color:var(--ng);background:var(--gg);border:1px solid rgba(0,255,157,.15)}
+.tag-quant{color:var(--nv);background:var(--gv);border:1px solid rgba(177,74,255,.15)}
+
+/* SVG animations */
+@keyframes svgPulse{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes svgGlow{0%,100%{filter:drop-shadow(0 0 2px currentColor)}50%{filter:drop-shadow(0 0 8px currentColor)}}
+.scene svg line, .scene svg circle, .scene svg rect{transition:all .3s}
+
+/* ══ PHASES ══ */
+.ph{display:none}.ph.on{display:block;animation:su .4s ease}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ph-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1rem;color:var(--tb);margin-bottom:6px}
+.ph-title .icon{font-size:1.2rem}
+.ph-sub{font-size:.82rem;color:var(--td);margin-bottom:10px;line-height:1.5}
+
+/* ══ TEXTAREA + WRITING METER ══ */
+.input-wrap{position:relative;margin-bottom:4px}
+textarea{width:100%;background:var(--s2);border:2px solid rgba(255,255,255,.08);border-radius:var(--rs);color:var(--t);font-family:'Outfit',sans-serif;font-size:.9rem;padding:14px 18px;resize:vertical;min-height:78px;transition:border-color .25s,box-shadow .25s}
+textarea:focus{outline:none;border-color:var(--ng);box-shadow:0 0 16px rgba(0,255,157,.1)}
+textarea::placeholder{color:rgba(255,255,255,.18)}
+.write-meter{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:.74rem;color:var(--td)}
+.meter-bar{flex:0 0 80px;height:4px;background:var(--s3);border-radius:100px;overflow:hidden}
+.meter-fill{height:100%;border-radius:100px;transition:width .3s,background .3s;width:0%}
+.meter-label{font-weight:500;transition:color .3s}
+
+/* ══ BUTTONS ══ */
+.btn{font-family:'Outfit',sans-serif;font-weight:600;border:none;border-radius:var(--rs);padding:13px 26px;cursor:pointer;transition:all .25s;font-size:.9rem;display:inline-flex;align-items:center;gap:7px}
+.btn:active{transform:scale(.96)}
+.btn-neon{background:linear-gradient(135deg,var(--ng),#00cc7e);color:#080c16;font-weight:700;box-shadow:0 4px 16px rgba(0,255,157,.2)}
+.btn-neon:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,255,157,.3)}
+.btn-ghost{background:transparent;border:1.5px solid rgba(255,255,255,.12);color:var(--t);padding:11px 20px;font-size:.82rem}
+.btn-ghost:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+
+/* ══ FEEDBACK ══ */
+.fb{padding:14px 18px;border-radius:var(--rs);margin-top:14px;font-size:.86rem;line-height:1.65;display:none}
+.fb.vis{display:block;animation:su .3s ease}
+.fb.good{background:linear-gradient(135deg,rgba(0,255,157,.08),rgba(0,212,255,.05));border:1px solid rgba(0,255,157,.2);color:var(--ng)}
+.fb.tip{background:linear-gradient(135deg,rgba(255,133,52,.08),rgba(255,226,52,.05));border:1px solid rgba(255,133,52,.2);color:var(--no)}
+.fb.inf{background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(177,74,255,.05));border:1px solid rgba(0,212,255,.2);color:var(--nb)}
+.fb.wrong{background:linear-gradient(135deg,rgba(255,71,87,.08),rgba(255,45,149,.05));border:1px solid rgba(255,71,87,.2);color:var(--nr)}
+.key-concept{margin-top:12px;padding:14px 18px;border-radius:var(--rs);font-size:.84rem;line-height:1.6;background:linear-gradient(135deg,rgba(177,74,255,.08),rgba(0,212,255,.05));border:1px solid rgba(177,74,255,.2);color:var(--nv);display:none}
+.key-concept.vis{display:block;animation:su .4s ease}
+.key-concept strong{color:var(--tb)}
+.fun-fact{margin-top:10px;padding:12px 16px;border-radius:var(--rs);font-size:.82rem;line-height:1.55;background:linear-gradient(135deg,rgba(255,226,52,.06),rgba(255,133,52,.04));border:1px solid rgba(255,226,52,.15);color:var(--ny);display:none}
+.fun-fact.vis{display:block;animation:su .5s ease}
+
+/* ══ QUIZ ══ */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+@media(max-width:640px){.choices{grid-template-columns:1fr}}
+.ch{background:var(--s2);border:2px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:14px 16px;color:var(--t);font-family:'Outfit',sans-serif;font-size:.86rem;cursor:pointer;transition:all .25s;text-align:left;line-height:1.5;display:flex;gap:10px;align-items:flex-start}
+.ch:hover{border-color:rgba(0,255,157,.25);background:rgba(0,255,157,.04);transform:translateY(-1px)}
+.ch .ch-letter{flex-shrink:0;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;background:var(--s3);color:var(--td);transition:all .25s}
+.ch:hover .ch-letter{background:rgba(0,255,157,.15);color:var(--ng)}
+.ch.right{border-color:var(--ng)!important;background:var(--gg)!important;color:var(--ng)!important;box-shadow:0 0 20px rgba(0,255,157,.15)}
+.ch.right .ch-letter{background:var(--ng);color:var(--bg)}
+.ch.wrong{border-color:var(--nr)!important;background:var(--gr)!important;color:var(--nr)!important;opacity:.55}
+.ch.wrong .ch-letter{background:var(--nr);color:var(--bg)}
+.ch[disabled]{pointer-events:none}
+
+/* ══ TOPIC REVEAL ══ */
+#topicRivelazione{position:fixed;inset:0;z-index:9997;display:none;align-items:center;justify-content:center;background:rgba(8,12,22,.85);backdrop-filter:blur(8px)}
+#topicRivelazione.show{display:flex}
+.reveal-content{text-align:center;animation:revealIn .5s ease}
+@keyframes revealIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.reveal-num{font-size:4rem;font-weight:800;margin-bottom:8px}
+.reveal-tag{font-size:1.4rem;font-weight:700;color:var(--tb)}
+.reveal-sub{font-size:.9rem;color:var(--td);margin-top:6px}
+
+/* ══ RESULTS ══ */
+.res{text-align:center;padding:32px 20px}
+.res .big{font-family:'Fraunces',serif;font-size:3.8rem;font-weight:700;margin:14px 0;background:linear-gradient(135deg,var(--ng),var(--nb));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.res p{color:var(--td);margin:5px 0}
+.res .msg{font-size:.94rem;color:var(--t);margin-top:14px;line-height:1.7;max-width:520px;margin-inline:auto}
+.stats{display:flex;justify-content:center;gap:16px;margin-top:18px;flex-wrap:wrap}
+.stat-card{background:var(--s2);border:1px solid var(--brd);border-radius:var(--rs);padding:14px 20px;min-width:100px;text-align:center}
+.stat-card .stat-val{font-size:1.5rem;font-weight:700}
+.stat-card .stat-label{font-size:.74rem;color:var(--td);margin-top:4px}
+.breakdown{margin-top:20px;text-align:left;max-width:500px;margin-inline:auto}
+.breakdown h3{font-size:.85rem;font-weight:600;color:var(--tb);margin-bottom:10px;text-align:center}
+.bd-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem}
+.bd-topic{flex:1;color:var(--t)}.bd-result{font-weight:700;font-size:.9rem}
+.bd-result.ok{color:var(--ng)}.bd-result.fail{color:var(--nr)}
+.mt{margin-top:14px}.hide{display:none!important}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .5s ease}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+<div id="flash"></div>
+<div id="topicRivelazione"><div class="reveal-content"><div class="reveal-num" id="revNum"></div><div class="reveal-tag" id="revTag"></div><div class="reveal-sub" id="revSub"></div></div></div>
+
+<!-- ══════ INTRO SCREEN ══════ -->
+<div id="introScreen">
+  <h1>👁️ Vedo · Penso<br><em>Mi chiedo</em></h1>
+  <p class="intro-sub">Un gioco basato sulla routine di pensiero <strong>See – Think – Wonder</strong> di Harvard Project Zero. Osserva fenomeni fisici, interpretali, poni domande e impara la fisica come uno scienziato.</p>
+  <div class="intro-features">
+    <div class="intro-feat"><div class="feat-icon">👁️</div><div class="feat-title">Osserva</div><div class="feat-desc">Descrivi ciò che vedi senza interpretazione</div></div>
+    <div class="intro-feat"><div class="feat-icon">🧠</div><div class="feat-title">Interpreta</div><div class="feat-desc">Spiega che cosa pensi stia accadendo</div></div>
+    <div class="intro-feat"><div class="feat-icon">❓</div><div class="feat-title">Chiediti</div><div class="feat-desc">Formula domande per l’indagine</div></div>
+    <div class="intro-feat"><div class="feat-icon">📝</div><div class="feat-title">Quiz</div><div class="feat-desc">Metti alla prova le tue conoscenze</div></div>
+  </div>
+  <div class="intro-topics">
+    <span class="intro-topic tag-elec" style="border:1px solid rgba(255,226,52,.15)">⚡ Elettricità</span>
+    <span class="intro-topic tag-force" style="border:1px solid rgba(255,45,149,.15)">🎿 Forze</span>
+    <span class="intro-topic tag-energy" style="border:1px solid rgba(255,133,52,.15)">🎢 Energia</span>
+    <span class="intro-topic tag-wave" style="border:1px solid rgba(0,255,240,.15)">🌊 Onde</span>
+    <span class="intro-topic tag-osc" style="border:1px solid rgba(0,212,255,.15)">🔔 Oscillazioni</span>
+    <span class="intro-topic tag-optic" style="border:1px solid rgba(0,255,157,.15)">🪞 Ottica</span>
+    <span class="intro-topic tag-quant" style="border:1px solid rgba(177,74,255,.15)">⚛️ Quantistica</span>
+  </div>
+  <button class="btn-start" onclick="startGioco()">Inizia il gioco →</button>
+  <p style="margin-top:16px;font-size:.78rem;color:var(--td)">7 scenari · Livello scuola superiore · ~15 minuti</p>
+</div>
+
+<!-- ══════ GAME SCREEN ══════ -->
+<div id="gameScreen" class="hide">
+<div class="hdr">
+  <div class="badge">Project Zero · Gioco 1 / 3</div>
+  <h1>Vedo · Penso · <em>Mi chiedo</em></h1>
+</div>
+<div class="wrap">
+  <div class="steps" id="steps"></div>
+  <div class="sbar">
+    <span class="lb">Scenario</span><span class="vl green" id="snum">1/7</span>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <span class="lb">Punti</span><span class="vl yellow" id="score">0</span>
+    <div class="streak hidden" id="streakBadge">🔥 <span id="streakNum">0</span></div>
+  </div>
+  <div id="gameArea">
+    <div class="card" id="mainCard">
+      <!-- Pipeline -->
+      <div class="pipeline" id="pipeline">
+        <div class="pipe-step active" id="pipe0"><span class="pipe-icon">👁️</span> Vedo</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-step" id="pipe1"><span class="pipe-icon">🧠</span> Penso</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-step" id="pipe2"><span class="pipe-icon">❓</span> Mi chiedo</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-step" id="pipe3"><span class="pipe-icon">📝</span> Quiz</div>
+      </div>
+      <div class="scene"><span class="scene-tag" id="sceneTag"></span><div id="sceneImg"></div></div>
+      <!-- SEE -->
+      <div class="ph on" id="phSee">
+        <div class="ph-title"><span class="icon">👁️</span> Che cosa vedi?</div>
+        <p class="ph-sub">Descrivi solo questo che osservi — forme, simboli, etichette. Senza interpretazione ancora.</p>
+        <div class="input-wrap"><textarea id="inSee" placeholder="Osservo che..." oninput="updateMeter('see')"></textarea></div>
+        <div class="write-meter"><div class="meter-bar"><div class="meter-fill" id="meterSee"></div></div><span class="meter-label" id="meterLabelSee">Scrivi qualcosa...</span></div>
+        <div class="row"><button class="btn btn-neon" onclick="submitPhase('see')">Avanti →</button><button class="btn btn-ghost" onclick="showHint('see')">💡 Domanda socratica</button></div>
+        <div class="fb" id="fbSee"></div>
+      </div>
+      <!-- THINK -->
+      <div class="ph" id="phPensa">
+        <div class="ph-title"><span class="icon">🧠</span> Che cosa pensi?</div>
+        <p class="ph-sub">Interpreta αυτά che hai osservato. Usa termini scientifici αν μπορείς.</p>
+        <div class="input-wrap"><textarea id="inPensa" placeholder="Νομίζω che questo συμβαίνει επειδή..." oninput="updateMeter('think')"></textarea></div>
+        <div class="write-meter"><div class="meter-bar"><div class="meter-fill" id="meterPensa"></div></div><span class="meter-label" id="meterLabelPensa">Scrivi qualcosa...</span></div>
+        <div class="row"><button class="btn btn-neon" onclick="submitPhase('think')">Avanti →</button><button class="btn btn-ghost" onclick="showHint('think')">💡 Domanda socratica</button></div>
+        <div class="fb" id="fbPensa"></div>
+      </div>
+      <!-- WONDER -->
+      <div class="ph" id="phWonder">
+        <div class="ph-title"><span class="icon">❓</span> Che cosa ti chiedi?</div>
+        <p class="ph-sub">Quale domande tuo δημιουργούνται; Σκέψου «Τι θα γινόταν αν…».</p>
+        <div class="input-wrap"><textarea id="inWonder" placeholder="Mi chiedo τι θα succederebbe αν..." oninput="updateMeter('wonder')"></textarea></div>
+        <div class="write-meter"><div class="meter-bar"><div class="meter-fill" id="meterWonder"></div></div><span class="meter-label" id="meterLabelWonder">Scrivi qualcosa...</span></div>
+        <div class="row"><button class="btn btn-neon" onclick="submitPhase('wonder')">Andiamo nel Quiz →</button><button class="btn btn-ghost" onclick="showHint('wonder')">💡 Domanda socratica</button></div>
+        <div class="fb" id="fbWonder"></div>
+      </div>
+      <!-- QUIZ -->
+      <div class="ph" id="phQuiz">
+        <div class="ph-title"><span class="icon">📝</span> Ερώτηση di applicazione</div>
+        <p id="quizQ" style="font-size:.93rem;color:var(--tb);line-height:1.65;margin-bottom:4px"></p>
+        <div class="choices" id="quizC"></div>
+        <div class="fb" id="fbQuiz"></div>
+        <div class="key-concept" id="keyConcept"></div>
+        <div class="fun-fact" id="funFact"></div>
+        <div class="row hide" id="nextRow"><button class="btn btn-neon" onclick="nextScenario()">Avanti scenario →</button></div>
+      </div>
+    </div>
+  </div>
+  <!-- RESULTS -->
+  <div class="card hide" id="resCard">
+    <div class="res">
+      <p style="font-size:1.15rem;color:var(--tb)">Hai completato το gioco!</p>
+      <div class="big" id="resBig">0/7</div><p>Σωστές απαντήσεις</p>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-val" style="color:var(--ny)" id="resPts">0</div><div class="stat-label">Punti</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--no)" id="resSerie">0</div><div class="stat-label">Μέγιστο streak</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--nc)" id="resBonus">0</div><div class="stat-label">Bonus</div></div>
+      </div>
+      <div class="breakdown" id="breakdown"><h3>Επίδοση ανά θέμα</h3></div>
+      <p class="msg" id="resMsg"></p>
+      <div class="mt"><button class="btn btn-neon" onclick="restart()" style="font-size:1rem;padding:16px 36px">Gioca ξανά 🔄</button></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ══ CONFETTI ══
+const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');let confetti=[];
+function rC(){canvas.width=innerWidth;canvas.height=innerHeight}addEventListener('resize',rC);rC();
+function launchConfetti(n=60){const cl=['#00ff9d','#00d4ff','#ff2d95','#b14aff','#ffe234','#ff8534','#00fff0'];for(let i=0;i<n;i++)confetti.push({x:Math.random()*canvas.width,y:canvas.height+10,w:Math.random()*8+4,h:Math.random()*4+2,c:cl[~~(Math.random()*cl.length)],vy:-(Math.random()*12+6),vx:(Math.random()-.5)*6,r:Math.random()*360,rv:(Math.random()-.5)*8,g:.12+Math.random()*.08,l:1})}
+function aniC(){ctx.clearRect(0,0,canvas.width,canvas.height);confetti=confetti.filter(c=>{c.vy+=c.g;c.x+=c.vx;c.y+=c.vy;c.r+=c.rv;c.l-=.005;if(c.l<=0||c.y>canvas.height+20)return false;ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.r*Math.PI/180);ctx.globalAlpha=c.l;ctx.fillStyle=c.c;ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h);ctx.restore();return true});if(confetti.length)requestAnimationFrame(aniC)}
+
+// ══ FLASH ══
+function flash(color){const f=document.getElementById('flash');f.className=color;setTimeout(()=>f.className='',300)}
+
+// ══ TOPIC REVEAL ══
+function showRivelazione(num,tag,sub,color){
+  const r=document.getElementById('topicRivelazione');
+  document.getElementById('revNum').textContent=num;document.getElementById('revNum').style.color=color;
+  document.getElementById('revTag').textContent=tag;document.getElementById('revSub').textContent=sub;
+  r.classList.add('show');setTimeout(()=>r.classList.remove('show'),1200);
+}
+
+// ══ DATA ══
+const LETTERS=['Α','Β','Γ','Δ'];
+const DATA=[
+{tag:"Elettricità",tagClass:"tag-elec",color:"#ffe234",sub:"Legge di Ohm · Circuito in serie",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><rect x="55" y="80" width="56" height="100" rx="8" fill="#1e293b" stroke="#ffe234" stroke-width="2"><animate attributeName="stroke-opacity" values=".6;1;.6" dur="2s" repeatCount="indefinite"/></rect><text x="83" y="120" text-anchor="middle" fill="#ffe234" font-size="11" font-weight="700">V = 12V</text><text x="83" y="140" text-anchor="middle" fill="#ffe234" font-size="16">+ −</text><text x="83" y="198" text-anchor="middle" fill="#7a8baa" font-size="10">Μπαταρία</text><line x1="111" y1="110" x2="200" y2="110" stroke="#00ff9d" stroke-width="2"/><rect x="200" y="96" width="70" height="28" rx="6" fill="#1e293b" stroke="#ff8534" stroke-width="2"/><text x="235" y="115" text-anchor="middle" fill="#ff8534" font-size="9" font-weight="600">Διακόπτης</text><line x1="270" y1="110" x2="370" y2="110" stroke="#00ff9d" stroke-width="2"/><rect x="370" y="94" width="80" height="32" rx="6" fill="#1e293b" stroke="#00d4ff" stroke-width="2"/><text x="410" y="108" text-anchor="middle" fill="#00d4ff" font-size="9" font-weight="600">R₁ = 4Ω</text><text x="410" y="120" text-anchor="middle" fill="#00d4ff" font-size="8">Αντίσταση</text><line x1="450" y1="110" x2="490" y2="110" stroke="#00ff9d" stroke-width="2"/><line x1="490" y1="110" x2="490" y2="210" stroke="#00ff9d" stroke-width="2"/><rect x="370" y="194" width="80" height="32" rx="6" fill="#1e293b" stroke="#b14aff" stroke-width="2"/><text x="410" y="208" text-anchor="middle" fill="#b14aff" font-size="9" font-weight="600">R₂ = 6Ω</text><line x1="370" y1="210" x2="83" y2="210" stroke="#00ff9d" stroke-width="2"/><line x1="83" y1="210" x2="83" y2="180" stroke="#00ff9d" stroke-width="2"/><line x1="490" y1="210" x2="450" y2="210" stroke="#00ff9d" stroke-width="2"/><circle cx="300" cy="110" r="12" fill="#1e293b" stroke="#ffe234" stroke-width="1.5"><animate attributeName="r" values="12;14;12" dur="1.5s" repeatCount="indefinite"/></circle><text x="300" y="114" text-anchor="middle" fill="#ffe234" font-size="8" font-weight="700">A</text><text x="300" y="90" text-anchor="middle" fill="#7a8baa" font-size="8">Αμπερόμετρο</text><text x="280" y="260" text-anchor="middle" fill="#ffe234" font-size="11" font-weight="600">V = I · R (Νόμος Ohm)</text><text x="280" y="280" text-anchor="middle" fill="#7a8baa" font-size="10">Κύκλωμα σε serie · R_ολ = R₁ + R₂</text></svg>`,
+seeKw:["μπαταρί","αντίστ","αμπερ","διακόπτ","Ω","ohm","καλώδ","σειρ","volt","circuito","R","4","6","12"],
+thinkKw:["corrente","tensione","αντίστ","ohm","σειρ","ολικ","legge","ενέργ","ισχύ"],
+wonderKw:["αν","τι θα","parallel","αυξ","μειω","πώς","perché","term"],
+hints:{see:"Πρόσεξε le etichette: quale η tensione; Ποιες οι resistenze; Come συνδέονται (serie ή in parallelo);",think:"Εφάρμοσε V=IR: αν R_ολ = R₁+R₂, τι I βγαίνει;",wonder:"Che cosa cambierebbe αν οι resistenze ήταν in parallelo;"},
+seeFb:"Giusto. Circuito in serie: V=12V, R₁=4Ω, R₂=6Ω, amperometro, interruttore.",
+thinkFb:"R_ολ=4+6=10Ω → I=V/R=12/10=1.2A.",
+wonderFb:"Η σύγκριση serieς/parallela collegamentoς è θεμελιώδης nella Φυσική.",
+quiz:"V=12V, R₁=4Ω, R₂=6Ω σε serie. Qual è l’intensità I;",
+opts:["I = 2 A","I = 1.2 A","I = 0.5 A","I = 12 A"],ans:1,
+quizExplain:"R_ολ=4+6=10Ω. I=V/R=12/10=1.2 A.",
+keyConcept:"<strong>Νόμος Ohm:</strong> V=I·R. Σε serie: R_ολ=R₁+R₂. Το corrente è stesso παντού.",
+funFact:"💡 Ο Georg Ohm δημοσίευσε il νόμο del το 1827, αλλά αγνοήθηκε per χρόνια. Σήμερα, η μονάδα resistenzaς φέρει το όνομά del!"},
+{tag:"Forze",tagClass:"tag-force",color:"#ff2d95",sub:"Piano inclinato · Analisi delle forze",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><polygon points="80,260 490,260 490,100" fill="#1e293b" stroke="#7a8baa" stroke-width="2"/><rect x="270" y="140" width="52" height="42" rx="5" fill="#00d4ff" opacity=".75" transform="rotate(-18.4 296 161)"><animate attributeName="opacity" values=".6;.9;.6" dur="2s" repeatCount="indefinite"/></rect><text x="296" y="165" text-anchor="middle" fill="#0c4a6e" font-size="11" font-weight="700" transform="rotate(-18.4 296 161)">2kg</text><line x1="296" y1="180" x2="296" y2="245" stroke="#ff4757" stroke-width="2.5" marker-end="url(#aw)"/><text x="312" y="228" fill="#ff4757" font-size="10" font-weight="600">W=mg=20N</text><line x1="280" y1="157" x2="248" y2="112" stroke="#00ff9d" stroke-width="2.5" marker-end="url(#ag)"/><text x="222" y="108" fill="#00ff9d" font-size="10" font-weight="600">N</text><line x1="310" y1="153" x2="355" y2="139" stroke="#ffe234" stroke-width="2.5" marker-end="url(#ay)"/><text x="360" y="134" fill="#ffe234" font-size="10" font-weight="600">f τριβής</text><line x1="282" y1="168" x2="252" y2="200" stroke="#ff2d95" stroke-width="2" marker-end="url(#ap)" stroke-dasharray="5,3"/><text x="218" y="212" fill="#ff2d95" font-size="9">W_x=mg·sinθ</text><path d="M 140,260 A 70,70 0 0,0 150,237" fill="none" stroke="#00fff0" stroke-width="2"/><text x="165" y="248" fill="#00fff0" font-size="12" font-weight="600">θ=30°</text><text x="280" y="298" text-anchor="middle" fill="#7a8baa" font-size="10">g=10 m/s²</text><defs><marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#ff4757"/></marker><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#00ff9d"/></marker><marker id="ay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#ffe234"/></marker><marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#ff2d95"/></marker></defs></svg>`,
+seeKw:["κεκλιμ","corpo","βέλ","peso","τριβ","γωνί","2kg","30","N","W"],
+thinkKw:["δύναμ","peso","τριβ","ισορροπ","κάθετ","συνιστ","sin","cos","moto","ανάλυ"],
+wonderKw:["αν","τι θα","μεγαλ","μικρ","perché","πώς","τριβ","επιτάχ"],
+hints:{see:"Μέτρησε τα βέλη — ogni χρώμα = διαφορετική forza. Ποιες συνιστώσες βλέπεις;",think:"W_x=mg·sinθ τραβάει sotto. Quale forza αντιστέκεται;",wonder:"Υπάρχει κρίσιμη angolo che αρχίζει η ολίσθηση;"},
+seeFb:"Σώμα 2kg, κεκλιμένο 30°, peso W=20N, κάθετη N, τριβή f, συνιστώσα W_x.",
+thinkFb:"W_x = mg·sin30° = 20×0.5 = 10N contro lunghezza.",
+wonderFb:"È proprio questa la domanda che si pone un fisico!",
+quiz:"W_x per m=2kg, θ=30°, g=10 m/s²;",
+opts:["W_x = 20 N","W_x = 10 N","W_x = 17.3 N","W_x = 5 N"],ans:1,
+quizExplain:"W_x = mg·sinθ = 2×10×sin30° = 20×0.5 = 10 N.",
+keyConcept:"<strong>Κεκλιμένο piano:</strong> W_x=mg·sinθ (in parallelo), W_y=mg·cosθ (κάθετα).",
+funFact:"🎿 Ο Γαλιλαίος χρησιμοποίησε κεκλιμένα επίπεδα per να μελετήσει la accelerazione, perché η caduta libera ήταν molto γρήγορη per μέτρηση!"},
+{tag:"Energia",tagClass:"tag-energy",color:"#ff8534",sub:"Conservazione dell’energia meccanica",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><path d="M 40,80 Q 100,80 120,200 Q 140,285 200,180 Q 260,70 320,200 Q 380,290 440,150 Q 480,80 530,110" fill="none" stroke="#7a8baa" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="78" r="12" fill="#ff2d95" stroke="#ff6bae" stroke-width="2"><animate attributeName="r" values="12;14;12" dur="1.5s" repeatCount="indefinite"/></circle><text x="50" y="60" text-anchor="middle" fill="#ff2d95" font-size="10" font-weight="700">Α (h=20m)</text><text x="50" y="98" text-anchor="middle" fill="#ff2d95" font-size="7">E_κ=0</text><circle cx="135" cy="238" r="10" fill="#00d4ff"/><text x="135" y="260" text-anchor="middle" fill="#00d4ff" font-size="10" font-weight="600">Β (h≈0)</text><text x="135" y="278" text-anchor="middle" fill="#00d4ff" font-size="7">E_κ=MAX</text><circle cx="260" cy="72" r="10" fill="#00ff9d"/><text x="260" y="56" text-anchor="middle" fill="#00ff9d" font-size="10" font-weight="600">Γ (h=18m)</text><circle cx="440" cy="148" r="10" fill="#ffe234"/><text x="440" y="135" text-anchor="middle" fill="#ffe234" font-size="10" font-weight="600">Δ (h=10m)</text><text x="280" y="305" text-anchor="middle" fill="#ffe234" font-size="10" font-weight="600">E_μηχ = E_κ + E_δ = costante</text></svg>`,
+seeKw:["σημεί","Α","Β","Γ","Δ","altezza","ενέργ","κινητ","δυναμ","20","18","10"],
+thinkKw:["ενέργ","δυναμ","κινητ","ταχύτ","altezza","μετατρ","διατήρ","μηχαν"],
+wonderKw:["αν","τι θα","τριβ","απώλ","ταχύτ","perché","πώς"],
+hints:{see:"Σημείωσε τα ύψη ogni σημείου. Πού ξεκινά με E_κ=0;",think:"E_μηχ = ½mv² + mgh = σταθ. Πού μεγιστοποιείται η velocità;",wonder:"Θα φτάσει nel Γ (18m) αν ξεκινά da Α (20m) με attriti;"},
+seeFb:"4 σημεία σε διαφορετικά ύψη. Στο Α ξεκινά με E_κ=0.",
+thinkFb:"Στο Β (h≈0): ½mv² = mgh_A → v = √(2gh).",
+wonderFb:"Η τριβή μετατρέπει μηχανική energia σε calore.",
+quiz:"Από σtensione nel Α (h=20m), velocità nel Β (h≈0); (g=10)",
+opts:["v = 10 m/s","v = 20 m/s","v = 14.1 m/s","v = 200 m/s"],ans:1,
+quizExplain:"v = √(2gh) = √(2×10×20) = √400 = 20 m/s.",
+keyConcept:"<strong>Διατήρηση Ε_μηχ:</strong> E_κ + E_δ = σταθ. Στο χαμηλότερο punto: v=√(2gh).",
+funFact:"🎢 Το πρώτο ρόλερ κόστερ κατασκευάστηκε nella Ρωσία il 18ο αιώνα — ήταν παγωμένες τσουλήθρες!"},
+{tag:"Onde",tagClass:"tag-wave",color:"#00fff0",sub:"Onda trasversale · v=f·λ",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><path d="M 40,155 Q 80,45 120,155 Q 160,265 200,155 Q 240,45 280,155 Q 320,265 360,155 Q 400,45 440,155 Q 480,265 520,155" fill="none" stroke="#00fff0" stroke-width="3"><animate attributeName="stroke-dashoffset" values="0;-40" dur="1s" repeatCount="indefinite"/><set attributeName="stroke-dasharray" to="600"/></path><line x1="30" y1="155" x2="540" y2="155" stroke="#333e5a" stroke-width="1" stroke-dasharray="6,4"/><line x1="120" y1="155" x2="120" y2="55" stroke="#00ff9d" stroke-width="2" marker-end="url(#aw2)"/><line x1="120" y1="155" x2="120" y2="255" stroke="#00ff9d" stroke-width="2" marker-end="url(#aw2)"/><text x="98" y="100" fill="#00ff9d" font-size="11" font-weight="700">A=0.1m</text><line x1="80" y1="38" x2="240" y2="38" stroke="#b14aff" stroke-width="2"/><line x1="80" y1="32" x2="80" y2="44" stroke="#b14aff" stroke-width="2"/><line x1="240" y1="32" x2="240" y2="44" stroke="#b14aff" stroke-width="2"/><text x="160" y="28" text-anchor="middle" fill="#b14aff" font-size="12" font-weight="700">λ = 0.4 m</text><text x="25" y="160" font-size="20">✋</text><text x="280" y="298" text-anchor="middle" fill="#ffe234" font-size="10" font-weight="600">υ = f · λ  |  f = 5 Hz</text><defs><marker id="aw2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#00ff9d"/></marker></defs></svg>`,
+seeKw:["onda","πλάτ","lunghezza","λ","Α","Hz","0.4","0.1","5"],
+thinkKw:["onda","πλάτ","lunghezza","συχνότ","ταχύτ","διάδο","εγκάρσ"],
+wonderKw:["αν","τι θα","γρήγ","αργ","perché","πώς","μεγαλ"],
+hints:{see:"Valori: A=?, λ=?, f=?. Τι σχήμα σχηματίζει;",think:"υ=f·λ. Υπολόγισε la velocità.",wonder:"Αν υ costante e f↑, τι succede nel λ;"},
+seeFb:"Εγκάρσιο onda, A=0.1m, λ=0.4m, f=5Hz.",
+thinkFb:"υ = 5 × 0.4 = 2 m/s.",
+wonderFb:"Από υ=f·λ: αν υ σταθ. e f↑, τότε λ↓.",
+quiz:"f=5Hz, λ=0.4m. Ταχύτητα υ;",
+opts:["υ = 12.5 m/s","υ = 2 m/s","υ = 0.08 m/s","υ = 5.4 m/s"],ans:1,
+quizExplain:"υ = f·λ = 5×0.4 = 2 m/s.",
+keyConcept:"<strong>Θεμελιώδης σχέση:</strong> υ=f·λ. Αν f↑ (σταθ. υ), τότε λ↓.",
+funFact:"🌊 Τα σεισμικά onde P (διαμήκη) ταξιδεύουν μέσα nella Γη με velocità ~8 km/s — 14.000× più rapidamente da il ήχο nel aria!"},
+{tag:"Oscillazioni",tagClass:"tag-osc",color:"#00d4ff",sub:"Pendolo semplice · T=2π√(L/g)",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><rect x="195" y="28" width="170" height="14" rx="4" fill="#333e5a"/><rect x="276" y="24" width="8" height="20" rx="2" fill="#00d4ff"/><line x1="280" y1="44" x2="280" y2="200" stroke="#7a8baa" stroke-width="2"/><circle cx="280" cy="218" r="20" fill="#00d4ff" stroke="#5ce1ff" stroke-width="2"><animate attributeName="cx" values="280;320;280;240;280" dur="2s" repeatCount="indefinite"/><animate attributeName="cy" values="218;210;218;210;218" dur="2s" repeatCount="indefinite"/></circle><text x="280" y="224" text-anchor="middle" fill="#0c4a6e" font-size="10" font-weight="700">m</text><line x1="280" y1="44" x2="175" y2="190" stroke="#333e5a" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/><circle cx="175" cy="202" r="15" fill="none" stroke="#b14aff" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/><text x="148" y="200" fill="#b14aff" font-size="10" opacity=".7">−θ₀</text><line x1="280" y1="44" x2="385" y2="190" stroke="#333e5a" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/><circle cx="385" cy="202" r="15" fill="none" stroke="#ff8534" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/><text x="402" y="200" fill="#ff8534" font-size="10" opacity=".7">+θ₀</text><text x="302" y="78" fill="#00ff9d" font-size="11" font-weight="600">L = 1m</text><text x="280" y="268" text-anchor="middle" fill="#ffe234" font-size="13" font-weight="700">T = 2π√(L/g)</text><text x="280" y="288" text-anchor="middle" fill="#7a8baa" font-size="10">g=10 m/s²</text></svg>`,
+seeKw:["εκκρεμ","νήμα","βαρίδ","m","L","1m","θέσ"],
+thinkKw:["ταλάντ","περίοδ","lunghezza","βαρύτ","τύπος","ρίζα"],
+wonderKw:["αν","τι θα","massa","lunghezza","φεγγάρ","g","διπλ","perché"],
+hints:{see:"L=?; g=?; Πόσες θέσεις βλέπεις;",think:"T=2π√(L/g). Η massa εμφανίζεται;",wonder:"Στο Φεγγάρι (g≈1.6), più rapidamente ή αργά;"},
+seeFb:"Εκκρεμές L=1m, τρεις θέσεις, τύπος T=2π√(L/g).",
+thinkFb:"T=2π√(1/10)≈2s. Η massa non παίζει ρόλο!",
+wonderFb:"Στο Φεγγάρι: T↑ → più αργή ταλάντωση.",
+quiz:"L=1m, g=10 m/s². Περίοδος T; (π≈3.14)",
+opts:["T ≈ 1 s","T ≈ 2 s","T ≈ 6.28 s","T ≈ 0.63 s"],ans:1,
+quizExplain:"T = 2π√(1/10) = 6.28×0.316 ≈ 2 s.",
+keyConcept:"<strong>Εκκρεμές:</strong> T=2π√(L/g). Εξαρτάται ΜΟΝΟ da L e g, ΟΧΙ τη massa.",
+funFact:"⏱️ Ο Χίστιαν Χόιχενς κατασκεύασε το πρώτο ρολόι εκκρεμούς το 1656 — αύξησε la ακρίβεια ρολογιών da ±15 λεπτά σε ±15 δευτερόλεπτα ανά ημέρα!"},
+{tag:"Ottica",tagClass:"tag-optic",color:"#00ff9d",sub:"Ανάκλαση & Διάθλαση · Νόμος Snell",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><line x1="40" y1="160" x2="520" y2="160" stroke="#333e5a" stroke-width="2"/><text x="52" y="150" fill="#7a8baa" font-size="10">Αέρας (n₁=1.00)</text><rect x="40" y="162" width="480" height="130" fill="#0c4a6e" opacity=".12"/><text x="52" y="180" fill="#00d4ff" font-size="10" opacity=".7">Γυαλί (n₂=1.50)</text><line x1="280" y1="50" x2="280" y2="290" stroke="#333e5a" stroke-width="1" stroke-dasharray="5,4"/><line x1="150" y1="50" x2="280" y2="160" stroke="#ffe234" stroke-width="2.5"/><text x="175" y="88" fill="#ffe234" font-size="10" font-weight="600">προσπίπτουσα</text><line x1="280" y1="160" x2="410" y2="50" stroke="#00ff9d" stroke-width="2.5"/><text x="370" y="88" fill="#00ff9d" font-size="10" font-weight="600">ανακλώμενη</text><line x1="280" y1="160" x2="340" y2="280" stroke="#ff2d95" stroke-width="2.5"><animate attributeName="stroke-opacity" values=".7;1;.7" dur="1.5s" repeatCount="indefinite"/></line><text x="345" y="238" fill="#ff2d95" font-size="10" font-weight="600">διαθλώμενη</text><text x="248" y="118" fill="#ffe234" font-size="11" font-weight="600">θ₁=45°</text><text x="297" y="208" fill="#ff2d95" font-size="11" font-weight="600">θ₂=?</text><text x="280" y="302" text-anchor="middle" fill="#ffe234" font-size="11" font-weight="600">n₁·sinθ₁ = n₂·sinθ₂</text></svg>`,
+seeKw:["ακτίν","luce","κάθετ","γωνί","ανάκλ","διάθλ","γυαλ","n","45","1.5","Snell"],
+thinkKw:["ανάκλ","διάθλ","legge","Snell","sin","ταχύτ","πυκν","γωνί"],
+wonderKw:["αν","τι θα","ολικ","κρίσιμ","perché","πώς"],
+hints:{see:"n₁=?; n₂=?; θ₁=?; Πόσες ακτίνες;",think:"sinθ₂=(n₁/n₂)·sinθ₁. Πλησιάζει ή απομακρύνεται;",wonder:"Τι αν luce πάει γυαλί→aria;"},
+seeFb:"3 ακτίνες, n₁=1, n₂=1.5, θ₁=45°.",
+thinkFb:"sinθ₂=(1/1.5)·sin45°=0.471 → θ₂≈28°. Πλησιάζει κάθετο.",
+wonderFb:"Η totale ανάκλαση: solo da πυκνό→αραιό mezzo!",
+quiz:"Φως da aria (n₁=1) σε γυαλί (n₂=1.5), θ₁=45°. θ₂=;",
+opts:["θ₂ ≈ 45°","θ₂ ≈ 28°","θ₂ ≈ 60°","θ₂ ≈ 0°"],ans:1,
+quizExplain:"sinθ₂=(1/1.5)·sin45°=0.471 → θ₂≈28°.",
+keyConcept:"<strong>Snell:</strong> n₁·sinθ₁=n₂·sinθ₂. Πυκνότερο mezzo → θ₂ < θ₁.",
+funFact:"🌈 Οι οπτικές ίνες λειτουργούν χάρη nella totale εσωτερική ανάκλαση — το luce «παγιδεύεται» μέσα li e ταξιδεύει χιλιάδες χιλιόμετρα!"},
+{tag:"Quantistica",tagClass:"tag-quant",color:"#b14aff",sub:"Φωτοηλεκτρικό φαινόμενο · Einstein",
+svg:`<svg viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="310" fill="#111827" rx="14"/><rect x="235" y="90" width="105" height="150" rx="8" fill="#222e50" stroke="#7a8baa" stroke-width="2"/><text x="287" y="258" text-anchor="middle" fill="#7a8baa" font-size="10">Μεταλλική πλάκα</text><text x="287" y="272" text-anchor="middle" fill="#7a8baa" font-size="8">(W = 2.0 eV)</text><circle cx="75" cy="140" r="28" fill="#b14aff" opacity=".25"><animate attributeName="r" values="28;34;28" dur="1.5s" repeatCount="indefinite"/></circle><circle cx="75" cy="140" r="16" fill="#b14aff" opacity=".5"/><text x="75" y="146" text-anchor="middle" fill="#e2d4ff" font-size="16">⚡</text><text x="75" y="185" text-anchor="middle" fill="#b14aff" font-size="10" font-weight="600">UV luce</text><text x="75" y="198" text-anchor="middle" fill="#b14aff" font-size="8">f=8×10¹⁴Hz</text><line x1="105" y1="125" x2="230" y2="135" stroke="#b14aff" stroke-width="2" stroke-dasharray="8,5"><animate attributeName="stroke-dashoffset" values="0;-26" dur=".8s" repeatCount="indefinite"/></line><line x1="105" y1="140" x2="230" y2="150" stroke="#b14aff" stroke-width="2" stroke-dasharray="8,5"><animate attributeName="stroke-dashoffset" values="0;-26" dur=".8s" repeatCount="indefinite"/></line><line x1="105" y1="155" x2="230" y2="165" stroke="#b14aff" stroke-width="2" stroke-dasharray="8,5"><animate attributeName="stroke-dashoffset" values="0;-26" dur=".8s" repeatCount="indefinite"/></line><text x="170" y="118" fill="#b14aff" font-size="9">φωτόνια (E=hf)</text><circle cx="370" cy="120" r="6" fill="#ffe234"><animate attributeName="cx" values="345;400" dur="1.5s" repeatCount="indefinite"/></circle><circle cx="385" cy="155" r="6" fill="#ffe234"><animate attributeName="cx" values="345;410" dur="1.8s" repeatCount="indefinite"/></circle><circle cx="375" cy="195" r="6" fill="#ffe234"><animate attributeName="cx" values="345;395" dur="1.3s" repeatCount="indefinite"/></circle><text x="430" y="125" fill="#ffe234" font-size="10" font-weight="600">→ φωτοηλεκτρόνια</text><rect x="330" y="44" width="210" height="38" rx="10" fill="#1e293b" stroke="#b14aff" stroke-width="1"/><text x="435" y="58" text-anchor="middle" fill="#b14aff" font-size="9">Μόνο αν hf > W</text><text x="435" y="74" text-anchor="middle" fill="#b14aff" font-size="8">(soglia συχνότητας)</text><text x="287" y="298" text-anchor="middle" fill="#ffe234" font-size="12" font-weight="700">E_κ = hf − W (Einstein 1905)</text></svg>`,
+seeKw:["luce","μέταλ","πλάκα","ηλεκτρόν","UV","φωτόν","eV","e⁻","Einstein","W"],
+thinkKw:["φωτόν","ενέργ","εκπομπ","ηλεκτρόν","συχνότ","κβαντ","κατώφλ","hf"],
+wonderKw:["αν","τι θα","κόκκιν","intensità","αριθμ","perché","πώς"],
+hints:{see:"Qual è f; Ποιο το W; Τι βγαίνει da la πλάκα;",think:"E=hf=3.31eV. Σύγκρινε με W=2eV. Τι μένει;",wonder:"Αν αυξήσεις intensità αλλά f<κατωφλίου, θα βγουν e⁻;"},
+seeFb:"UV φωτόνια (f=8×10¹⁴Hz) πέφτουν σε μέταλλο (W=2eV) → εκπομπή e⁻.",
+thinkFb:"E=hf=3.31eV > W=2eV → e⁻ με E_κ=1.31eV.",
+wonderFb:"Ένταση = αριθμός φωτονίων. Αν hf<W, κανένα e⁻ ανεξαρτήτως έντασης!",
+quiz:"hf=3.31eV, W=2.0eV. Μέγιστη E_κ φωτοηλεκτρονίων;",
+opts:["E_κ = 5.31 eV","E_κ = 1.31 eV","E_κ = 2.0 eV","E_κ = 0 (non βγαίνουν)"],ans:1,
+quizExplain:"E_κ = hf − W = 3.31 − 2.0 = 1.31 eV.",
+keyConcept:"<strong>Φωτοηλεκτρικό (Einstein):</strong> E_κ=hf−W. Αν hf<W → κανένα e⁻.",
+funFact:"🏆 Ο Einstein πήρε Nobel Φυσικής (1921) per το φωτοηλεκτρικό, ΟΧΙ per τη σχετικότητα! Η εξίσωση E=mc² non βραβεύτηκε ποτέ."}
+];
+
+// ══ STATE ══
+let cur=0,pts=0,streak=0,maxSerie=0,bonusPts=0,correct=0,results=[];
+
+function startGioco(){
+  document.getElementById('introScreen').classList.add('hide');
+  document.getElementById('gameScreen').classList.remove('hide');
+  document.getElementById('gameScreen').style.animation='fadeIn .6s ease';
+  init();
+}
+function init(){
+  cur=0;pts=0;streak=0;maxSerie=0;bonusPts=0;correct=0;results=[];
+  document.getElementById('resCard').classList.add('hide');
+  document.getElementById('gameArea').classList.remove('hide');
+  buildSteps();loadScenario();
+}
+function buildSteps(){const c=document.getElementById('steps');c.innerHTML='';DATA.forEach((d,i)=>{const s=document.createElement('div');s.className='sp'+(i===0?' on':'');s.id='st'+i;s.innerHTML=`<span class="n">${i+1}</span>${d.tag}`;c.appendChild(s)})}
+function updateSteps(){DATA.forEach((_,i)=>{document.getElementById('st'+i).className='sp'+(i<cur?' ok':(i===cur?' on':''))})}
+function updatePipeline(phase){
+  const map={see:0,think:1,wonder:2,quiz:3};const idx=map[phase];
+  for(let i=0;i<4;i++){const p=document.getElementById('pipe'+i);p.className='pipe-step'+(i<idx?' done':(i===idx?' active':''))}
+}
+function loadScenario(){
+  const d=DATA[cur];
+  if(cur>0) showRivelazione(`${cur+1}/7`,d.tag,d.sub,d.color);
+  setTimeout(()=>{
+    document.getElementById('sceneTag').textContent=d.tag;
+    document.getElementById('sceneTag').className='scene-tag '+d.tagClass;
+    document.getElementById('sceneImg').innerHTML=d.svg;
+    document.getElementById('snum').textContent=`${cur+1}/7`;
+    document.getElementById('pfill').style.width=`${(cur/7)*100}%`;
+    document.getElementById('score').textContent=pts;
+    updateSerieUI();updatePipeline('see');
+    ['phSee','phPensa','phWonder','phQuiz'].forEach(id=>document.getElementById(id).classList.remove('on'));
+    document.getElementById('phSee').classList.add('on');
+    ['inSee','inPensa','inWonder'].forEach(id=>{document.getElementById(id).value=''});
+    ['fbSee','fbPensa','fbWonder','fbQuiz'].forEach(id=>{document.getElementById(id).className='fb';document.getElementById(id).style.display='none'});
+    ['keyConcept','funFact'].forEach(id=>{document.getElementById(id).className=id.replace(/([A-Z])/,'-$1').toLowerCase().replace('fun-f','fun-f');document.getElementById(id).style.display='none'});
+    document.getElementById('keyConcept').className='key-concept';document.getElementById('keyConcept').style.display='none';
+    document.getElementById('funFact').className='fun-fact';document.getElementById('funFact').style.display='none';
+    document.getElementById('nextRow').classList.add('hide');
+    document.getElementById('quizC').innerHTML='';
+    document.getElementById('mainCard').classList.remove('shake');
+    ['meterSee','meterPensa','meterWonder'].forEach(id=>{document.getElementById(id).style.width='0%';document.getElementById(id).style.background='var(--s3)'});
+    ['meterLabelSee','meterLabelPensa','meterLabelWonder'].forEach(id=>{document.getElementById(id).textContent='Scrivi qualcosa...';document.getElementById(id).style.color='var(--td)'});
+    updateSteps();
+    window.scrollTo({top:0,behavior:'smooth'});
+  },cur>0?1300:0);
+}
+function updateSerieUI(){const b=document.getElementById('streakBadge'),n=document.getElementById('streakNum');if(streak>=2){b.classList.remove('hidden');n.textContent=streak}else b.classList.add('hidden')}
+
+// ══ WRITING METER ══
+function updateMeter(phase){
+  const input=document.getElementById('in'+cap(phase)).value;
+  const kw=DATA[cur][phase+'Kw'];
+  const found=hasKw(input,kw);
+  const len=input.trim().length;
+  const fill=document.getElementById('meter'+cap(phase));
+  const label=document.getElementById('meterLabel'+cap(phase));
+  let pct=0,txt='Scrivi qualcosa...',col='var(--td)',barCol='var(--s3)';
+  if(len<5){pct=5;txt='Scrivi qualcosa...';barCol='var(--nr)'}
+  else if(found===0){pct=25;txt='Λίγη ορολογία...';col='var(--no)';barCol='var(--no)'}
+  else if(found===1){pct=55;txt='Buona αρχή!';col='var(--ny)';barCol='var(--ny)'}
+  else if(found>=2){pct=85;txt='Εξαιρετικά!';col='var(--ng)';barCol='var(--ng)'}
+  if(len>40&&found>=2){pct=100;txt='Τέλειο!'}
+  fill.style.width=pct+'%';fill.style.background=barCol;
+  label.textContent=txt;label.style.color=col;
+}
+
+// ══ KEYWORD CHECK ══
+function hasKw(t,kws){return kws.filter(k=>t.toLowerCase().includes(k.toLowerCase())).length}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+// ══ PHASES ══
+function submitPhase(p){
+  const d=DATA[cur];
+  let input,kw,fbId,fbText,nextId,nextPhase;
+  if(p==='see'){input=document.getElementById('inSee').value;kw=d.seeKw;fbId='fbSee';fbText=d.seeFb;nextId='phPensa';nextPhase='think'}
+  else if(p==='think'){input=document.getElementById('inPensa').value;kw=d.thinkKw;fbId='fbPensa';fbText=d.thinkFb;nextId='phWonder';nextPhase='wonder'}
+  else{input=document.getElementById('inWonder').value;kw=d.wonderKw;fbId='fbWonder';fbText=d.wonderFb;nextId='phQuiz';nextPhase='quiz'}
+  if(input.trim().length<8){showFb(fbId,'tip','Scrivi almeno una ολοκληρωμένη πρόταση.');return}
+  const f=hasKw(input,kw);
+  if(f>=2)showFb(fbId,'good','✓ '+fbText);
+  else if(f===1)showFb(fbId,'inf',fbText+' Δοκίμασε più συγκεκριμένη ορολογία.');
+  else showFb(fbId,'inf',fbText+' Εμβάθυνε περισσότερο.');
+  setTimeout(()=>{
+    document.getElementById('ph'+cap(p)).classList.remove('on');
+    document.getElementById(nextId).classList.add('on');
+    updatePipeline(nextPhase);
+    if(nextPhase==='quiz')loadQuiz();
+  },1200);
+}
+function showHint(p){showFb('fb'+cap(p),'tip','💡 '+DATA[cur].hints[p])}
+function showFb(id,type,msg){const el=document.getElementById(id);el.className='fb vis '+type;el.style.display='block';el.innerHTML=msg}
+
+// ══ QUIZ ══
+function loadQuiz(){
+  const d=DATA[cur];
+  document.getElementById('quizQ').textContent=d.quiz;
+  const c=document.getElementById('quizC');c.innerHTML='';
+  d.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='ch';b.innerHTML=`<span class="ch-letter">${LETTERS[i]}</span><span>${o}</span>`;b.onclick=()=>answerQuiz(i);c.appendChild(b)});
+}
+function answerQuiz(idx){
+  const d=DATA[cur];
+  document.querySelectorAll('#quizC .ch').forEach((b,i)=>{b.disabled=true;if(i===d.ans)b.classList.add('right');else if(i===idx&&i!==d.ans)b.classList.add('wrong')});
+  if(idx===d.ans){
+    pts++;correct++;streak++;if(streak>maxSerie)maxSerie=streak;
+    if(streak>=3){bonusPts+=streak;pts+=Math.floor(streak/2)}
+    document.getElementById('score').textContent=pts;updateSerieUI();
+    showFb('fbQuiz','good','🎯 Σωστά! '+d.quizExplain);
+    flash('green');launchConfetti(streak>=3?80:40);aniC();
+    results.push({tag:d.tag,ok:true});
+  }else{
+    streak=0;updateSerieUI();
+    showFb('fbQuiz','wrong','✗ Λάθος. '+d.quizExplain);
+    flash('red');document.getElementById('mainCard').classList.add('shake');
+    setTimeout(()=>document.getElementById('mainCard').classList.remove('shake'),500);
+    results.push({tag:d.tag,ok:false});
+  }
+  const kc=document.getElementById('keyConcept');kc.innerHTML=d.keyConcept;kc.className='key-concept vis';kc.style.display='block';
+  const ff=document.getElementById('funFact');ff.innerHTML=d.funFact;ff.className='fun-fact vis';ff.style.display='block';
+  document.getElementById('nextRow').classList.remove('hide');
+}
+
+// ══ NEXT / RESULTS ══
+function nextScenario(){cur++;if(cur>=DATA.length)showResults();else loadScenario()}
+function showResults(){
+  document.getElementById('gameArea').classList.add('hide');
+  document.getElementById('resCard').classList.remove('hide');
+  document.getElementById('pfill').style.width='100%';document.getElementById('snum').textContent='7/7';
+  document.getElementById('resBig').textContent=correct+'/7';
+  document.getElementById('resPts').textContent=pts;document.getElementById('resSerie').textContent=maxSerie;
+  document.getElementById('resBonus').textContent=bonusPts;
+  // Breakdown
+  const bd=document.getElementById('breakdown');
+  bd.innerHTML='<h3>Επίδοση ανά θέμα</h3>';
+  results.forEach(r=>{const row=document.createElement('div');row.className='bd-row';row.innerHTML=`<span class="bd-topic">${r.tag}</span><span class="bd-result ${r.ok?'ok':'fail'}">${r.ok?'✓ Σωστό':'✗ Λάθος'}</span>`;bd.appendChild(row)});
+  let msg='';
+  if(correct===7)msg='Τέλειο σκορ! Σκέφτεσαι come πραγματικός φυσικός — osservi, ερμηνεύεις, αναρωτιέσαι!';
+  else if(correct>=5)msg='Πολύ καλή επίδοση! Δοκίμασε ξανά per το τέλειο.';
+  else if(correct>=3)msg='Buona προσπάθεια! Η εξάσκηση φέρνει αποτελέσματα.';
+  else msg='Non απογοητεύεσαι — ogni μεγάλος φυσικός ξεκίνησε αναρωτώμενος!';
+  document.getElementById('resMsg').textContent=msg;
+  DATA.forEach((_,i)=>{document.getElementById('st'+i).className='sp ok'});
+  launchConfetti(correct>=5?120:40);aniC();
+}
+function restart(){document.getElementById('resCard').classList.add('hide');init()}
+</script>
+</body>
+</html>
