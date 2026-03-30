@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portale Giochi Project Zero</title>
+  <meta name="description" content="Una raccolta di giochi interattivi di pensiero ispirati al Project Zero: osservazione, inquiry, evidenze, connessioni, pensiero sistemico, riflessione e revisione." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#070b14; --panel:#0f1629; --panel2:#161f34; --panel3:#1d2844; --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.14);
+      --text:#eef4ff; --muted:#9fb0cf; --green:#2ee6a6; --blue:#71c9ff; --vio:#b998ff; --pink:#ff5ca8; --gold:#ffd166; --orange:#ff9b57;
+      --shadow:0 20px 54px rgba(0,0,0,.38); --radius:24px; --radius-sm:16px; --max:1240px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(46,230,166,.08), transparent 22%),
+        radial-gradient(circle at 82% 14%, rgba(113,201,255,.09), transparent 22%),
+        radial-gradient(circle at 76% 80%, rgba(185,152,255,.08), transparent 18%),
+        radial-gradient(circle at 28% 75%, rgba(255,92,168,.06), transparent 20%),
+        linear-gradient(180deg, #070b14 0%, #0a1120 42%, #070b14 100%);
+      font-family:'Outfit',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      overflow-x:hidden; position:relative;
+    }
+    body::before, body::after{content:""; position:fixed; inset:0; pointer-events:none; z-index:0;}
+    body::before{background:repeating-linear-gradient(180deg, rgba(255,255,255,.012) 0 1px, transparent 1px 4px); opacity:.15;}
+    body::after{background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 16%, transparent 86%, rgba(255,255,255,.02)); opacity:.16;}
+    a{color:inherit; text-decoration:none}
+    .container{width:min(calc(100% - 32px), var(--max)); margin:0 auto; position:relative; z-index:2}
+    .topbar{
+      position:sticky; top:10px; z-index:30; margin:14px auto 0; backdrop-filter:blur(14px); background:rgba(11,16,29,.72);
+      border:1px solid var(--line); border-radius:999px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:16px; box-shadow:var(--shadow);
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:0}
+    .brand-mark{width:42px; height:42px; border-radius:14px; background:linear-gradient(135deg,var(--green),var(--blue),var(--vio)); box-shadow:0 10px 28px rgba(113,201,255,.24); position:relative; flex:0 0 auto;}
+    .brand-mark::before,.brand-mark::after{content:""; position:absolute; border:2px solid rgba(7,11,20,.52); border-radius:999px;}
+    .brand-mark::before{inset:8px 10px 16px 8px}
+    .brand-mark::after{inset:16px 8px 8px 16px}
+    .brand-copy h1{margin:0; font-size:1rem; line-height:1.1}
+    .brand-copy p{margin:3px 0 0; color:var(--muted); font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:460px}
+    .nav{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .nav a, .nav span{padding:8px 12px; border-radius:999px; color:var(--muted); font-size:.82rem; font-weight:800; letter-spacing:.03em; transition:.2s ease;}
+    .nav a:hover{color:var(--text); background:rgba(255,255,255,.05)}
+    .play-all{background:linear-gradient(135deg,var(--blue),#9bd7ff 70%,var(--vio)); color:#08111f !important}
+    .beta-pill{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(255,209,102,.11); border:1px solid rgba(255,209,102,.22); color:var(--gold); font-size:.78rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase}
+    .hero{display:grid; grid-template-columns:1.12fr .88fr; gap:18px; margin-top:18px; align-items:stretch}
+    .hero-card,.hero-side,.section-card,.teacher-card,.footer-card,.game-card{
+      position:relative; overflow:hidden; border-radius:30px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(15,22,41,.94), rgba(15,22,41,.84)); box-shadow:var(--shadow);
+    }
+    .hero-card,.hero-side,.section-card,.teacher-card,.footer-card{padding:28px}
+    .hero-card::before,.hero-side::before,.section-card::before,.teacher-card::before,.footer-card::before,.game-card::before{
+      content:""; position:absolute; top:0; left:16px; right:16px; height:2px; background:linear-gradient(90deg, transparent, var(--green), var(--blue), var(--vio), transparent); opacity:.85;
+    }
+    .eyebrow{display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; background:rgba(113,201,255,.08); border:1px solid rgba(113,201,255,.18); color:var(--blue); font-size:.77rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase}
+    .hero-notice{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 0}
+    .utility-link{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid var(--line2); color:var(--text); font-size:.85rem; font-weight:700}
+    .hero h2{font-family:'Fraunces',serif; font-size:clamp(2.25rem,5vw,4rem); line-height:1.02; margin:18px 0 14px}
+    .grad{background:linear-gradient(135deg,var(--green),var(--blue),var(--vio),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent}
+    .hero p{margin:0; color:var(--muted); font-size:1rem; line-height:1.72; max-width:64ch}
+    .hero-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:22px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 18px; border-radius:16px; border:1px solid transparent; font-weight:900; letter-spacing:.01em; transition:.2s ease; cursor:pointer}
+    .btn-primary{background:linear-gradient(135deg,var(--green),#8ef0da 50%,var(--blue)); color:#08111f; box-shadow:0 10px 26px rgba(46,230,166,.18)}
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-ghost{background:rgba(255,255,255,.04); border-color:var(--line2); color:var(--text)}
+    .hero-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:24px}
+    .stat{padding:16px; border-radius:20px; background:rgba(255,255,255,.04); border:1px solid var(--line)}
+    .stat small{display:block; color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; font-weight:800}
+    .stat strong{display:block; margin-top:8px; font-size:1.15rem}
+    .mini-steps{display:grid; gap:12px; margin-top:16px}
+    .mini-step{display:grid; grid-template-columns:42px 1fr; gap:12px; align-items:flex-start; padding:14px 14px; border-radius:20px; background:rgba(255,255,255,.04); border:1px solid var(--line)}
+    .mini-step .n{display:grid; place-items:center; width:42px; height:42px; border-radius:14px; background:linear-gradient(135deg,var(--panel3),var(--panel2)); border:1px solid var(--line2); color:var(--blue); font-weight:900}
+    .mini-step strong{display:block; font-size:.94rem}
+    .mini-step span{display:block; margin-top:4px; color:var(--muted); line-height:1.58; font-size:.9rem}
+    .section-card{margin-top:18px}
+    .section-head{display:flex; justify-content:space-between; gap:14px; align-items:flex-end; margin-bottom:18px}
+    .section-head h3{font-family:'Fraunces',serif; font-size:2rem; margin:12px 0 8px}
+    .section-head p{margin:0; color:var(--muted); line-height:1.68; max-width:72ch}
+    .path-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:12px}
+    .path-node{padding:16px 14px; border-radius:22px; background:rgba(255,255,255,.04); border:1px solid var(--line); min-height:128px}
+    .step-num{display:grid; place-items:center; width:34px; height:34px; border-radius:12px; background:linear-gradient(135deg,var(--panel3),var(--panel2)); border:1px solid var(--line2); color:var(--green); font-weight:900}
+    .topic{margin-top:14px; color:var(--muted); font-size:.76rem; text-transform:uppercase; letter-spacing:.11em; font-weight:900}
+    .name{margin-top:6px; font-size:1rem; font-weight:800; line-height:1.35}
+    .games-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
+    .game-card{padding:22px}
+    .game-top{display:flex; justify-content:space-between; gap:16px; align-items:flex-start}
+    .icon-wrap{display:grid; place-items:center; width:62px; height:62px; border-radius:18px; background:linear-gradient(180deg,var(--panel3),var(--panel2)); border:1px solid var(--line2); box-shadow:0 10px 20px rgba(0,0,0,.2)}
+    .icon-wrap svg{width:38px; height:38px}
+    .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--muted); font-size:.74rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+    .game-card h4{margin:16px 0 6px; font-size:1.22rem}
+    .game-card .one-liner{margin:0 0 10px; color:var(--text); line-height:1.55; font-weight:700}
+    .game-card .desc{margin:0; color:var(--muted); line-height:1.68}
+    .game-foot{display:flex; justify-content:space-between; gap:12px; align-items:center; margin-top:18px}
+    .play-link{display:inline-flex; align-items:center; gap:8px; padding:12px 14px; border-radius:14px; font-weight:900; background:rgba(255,255,255,.05); border:1px solid var(--line2)}
+    .teacher-card p,.footer-card p{margin:0; color:var(--muted); line-height:1.7}
+    .teacher-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px; align-items:start}
+    .teacher-points{display:grid; gap:12px}
+    .teacher-point{padding:14px 16px; border-radius:18px; background:rgba(255,255,255,.04); border:1px solid var(--line)}
+    .teacher-point strong{display:block; margin-bottom:6px}
+    .footer-card{display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin:18px 0 26px}
+    .footer-links{display:flex; gap:10px; flex-wrap:wrap}
+    .footer-links a{padding:10px 14px; border-radius:999px; background:rgba(255,255,255,.04); border:1px solid var(--line); color:var(--muted); font-weight:800}
+    @media (max-width: 1120px){
+      .hero,.teacher-grid,.games-grid,.path-grid{grid-template-columns:1fr 1fr}
+      .path-grid{grid-template-columns:repeat(4,1fr)}
+      .hero-stats{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width: 780px){
+      .topbar,.hero,.teacher-grid,.games-grid,.path-grid,.footer-card{grid-template-columns:1fr; display:grid}
+      .topbar{display:flex; border-radius:24px}
+      .nav{justify-content:flex-start}
+      .brand-copy p{white-space:normal}
+    }
+    @media (max-width: 520px){
+      .container{width:min(calc(100% - 20px), var(--max))}
+      .hero-actions,.footer-links{width:100%}
+      .btn,.play-link{width:100%}
+      .hero-stats{grid-template-columns:1fr}
+      .path-grid{grid-template-columns:1fr}
+      .game-foot{flex-direction:column; align-items:stretch}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-copy">
+          <h1>Portale Giochi Project Zero</h1>
+          <p>Osservazione · Inquiry · Evidenze · Connessioni · Pensiero sistemico · Riflessione</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#path">Percorso</a>
+        <a href="#games">Giochi</a>
+        <span class="beta-pill">Beta testing</span>
+        <a href="./README_it.md">README</a>
+        <a href="#teachers">Per docenti</a>
+        <a class="play-all" href="#games">Apri la collezione</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <article class="hero-card">
+        <span class="eyebrow">Portale ispirato al Project Zero</span>
+        <div class="hero-notice">
+          <span class="beta-pill">Beta testing</span>
+          <a class="utility-link" href="./README_it.md">Apri il README · istruzioni, link e struttura della cartella</a>
+        </div>
+        <h2>Giochi di pensiero per <span class="grad">adolescenti che vogliono vedere più chiaramente e pensare più in profondità</span></h2>
+        <p>
+          Una raccolta di giochi interattivi ispirati alle thinking routines e allo spirito del Project Zero.
+          Si parte dall’osservazione, si passa all’inquiry, si argomenta con evidenze, si collegano idee,
+          si leggono sistemi e si ripensa a ciò che si pensava di sapere.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#games">Inizia il percorso</a>
+          <a class="btn btn-ghost" href="#teachers">Scopri come usarlo in classe</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <small>Giochi core</small>
+            <strong>7</strong>
+          </div>
+          <div class="stat">
+            <small>Movimenti di pensiero</small>
+            <strong>Osservazione → Revisione</strong>
+          </div>
+          <div class="stat">
+            <small>Stile</small>
+            <strong>Teen-facing · playable · reflective</strong>
+          </div>
+          <div class="stat">
+            <small>Stato</small>
+            <strong>Versione beta</strong>
+          </div>
+        </div>
+      </article>
+
+      <aside class="hero-side">
+        <span class="eyebrow">Come entrare</span>
+        <div class="mini-steps">
+          <div class="mini-step">
+            <div class="n">1</div>
+            <div>
+              <strong>Apri il portale</strong>
+              <span>Questa pagina è l’hub centrale della raccolta. Da qui entri in ogni gioco con un solo clic.</span>
+            </div>
+          </div>
+          <div class="mini-step">
+            <div class="n">2</div>
+            <div>
+              <strong>Leggi il README</strong>
+              <span>Il README contiene il link centrale, le istruzioni di base e la struttura della cartella.</span>
+            </div>
+          </div>
+          <div class="mini-step">
+            <div class="n">3</div>
+            <div>
+              <strong>Argomenta prima di affermare</strong>
+              <span>Un claim senza evidenze è solo arbitrarietà ben vestita.</span>
+            </div>
+          </div>
+          <div class="mini-step">
+            <div class="n">4</div>
+            <div>
+              <strong>Collega e ripensa</strong>
+              <span>La comprensione si approfondisce quando cambia il modo in cui guardi il problema.</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="path">
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Percorso di apprendimento</span>
+            <h3>Un percorso di pensiero in 7 giochi</h3>
+            <p>I giochi non sono sparsi a caso. Sono organizzati come un percorso: osservo, mi domando, indago, argomento, collego, rifletto e ripenso.</p>
+          </div>
+        </div>
+        <div class="path-grid">
+          <div class="path-node"><div class="step-num">1</div><div class="topic">Observe</div><div class="name">See–Think–Wonder</div></div>
+          <div class="path-node"><div class="step-num">2</div><div class="topic">Question</div><div class="name">Inquiry Forge</div></div>
+          <div class="path-node"><div class="step-num">3</div><div class="topic">Justify</div><div class="name">CER Mission</div></div>
+          <div class="path-node"><div class="step-num">4</div><div class="topic">Connect</div><div class="name">Bridge Builder</div></div>
+          <div class="path-node"><div class="step-num">5</div><div class="topic">System</div><div class="name">Parts · Purposes · Complexities</div></div>
+          <div class="path-node"><div class="step-num">6</div><div class="topic">Reflect</div><div class="name">I Used to Think… Now I Think…</div></div>
+          <div class="path-node"><div class="step-num">7</div><div class="topic">Revise</div><div class="name">Mind the Gap</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="games">
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Collezione principale</span>
+            <h3>Hub del portale</h3>
+            <p>Ogni scheda ti porta direttamente al gioco corrispondente. Le icone e i colori seguono la stessa famiglia estetica neon/dark della piattaforma.</p>
+          </div>
+        </div>
+
+        <div class="games-grid">
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path d="M4 24c4.8-8 11.4-12 20-12s15.2 4 20 12c-4.8 8-11.4 12-20 12S8.8 32 4 24Z" stroke="#2ee6a6" stroke-width="2.4"/>
+                  <circle cx="24" cy="24" r="6.2" stroke="#71c9ff" stroke-width="2.4"/>
+                  <circle cx="24" cy="24" r="2.5" fill="#b998ff"/>
+                </svg>
+              </div>
+              <span class="pill">Osservazione</span>
+            </div>
+            <h4>Osservo · Penso · Mi chiedo</h4>
+            <p class="one-liner">Parti dall’osservazione e impara a distinguere ciò che vedi, ciò che ipotizzi e ciò che vale davvero la pena chiedere.</p>
+            <p class="desc">Un gioco per allenare osservazione attenta, interpretazione iniziale e curiosità produttiva.</p>
+            <div class="game-foot">
+              <span class="pill">01_see-think-wonder_it.html</span>
+              <a class="play-link" href="./01_see-think-wonder_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path d="M10 33 20 14l18-3-4 18-18 8Z" stroke="#71c9ff" stroke-width="2.4" />
+                  <circle cx="33" cy="15" r="3.2" stroke="#b998ff" stroke-width="2.2"/>
+                </svg>
+              </div>
+              <span class="pill">Inquiry</span>
+            </div>
+            <h4>Inquiry Forge</h4>
+            <p class="one-liner">Impara a formulare domande migliori e a distinguere quale inquiry vale davvero la pena seguire.</p>
+            <p class="desc">Il giocatore non viene premiato perché chiede tanto, ma perché chiede in modo mirato, intelligente e disciplinato.</p>
+            <div class="game-foot">
+              <span class="pill">02_inquiry_forge_final_it.html</span>
+              <a class="play-link" href="./02_inquiry_forge_final_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <rect x="7" y="10" width="34" height="28" rx="6" stroke="#71c9ff" stroke-width="2.4"/>
+                  <path d="M15 18h18M15 24h12M15 30h9" stroke="#2ee6a6" stroke-width="2.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="pill">Evidenze</span>
+            </div>
+            <h4>CER Mission</h4>
+            <p class="one-liner">Costruisci affermazioni che reggono, con evidenze e ragionamento chiaro.</p>
+            <p class="desc">Basato sulla logica Claim–Evidence–Reasoning: qui non basta “pensarla”, bisogna sostenerla bene.</p>
+            <div class="game-foot">
+              <span class="pill">03_cer-mission_claude_it.html</span>
+              <a class="play-link" href="./03_cer-mission_claude_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path d="M8 30c4-8 9-12 15-12 4.7 0 8.8 2.3 12.5 7l4.5-4.5v16H24l5.2-5.2c-2.3-3-4.8-4.5-7.6-4.5-3.6 0-6.8 2.3-10 7.2Z" fill="#ff9b57"/>
+                </svg>
+              </div>
+              <span class="pill">Connessioni</span>
+            </div>
+            <h4>Bridge Builder</h4>
+            <p class="one-liner">Collega ciò che sai già a idee nuove e vedi dove il tuo pensiero si apre oppure si blocca.</p>
+            <p class="desc">Basato sulla routine Connect–Extend–Challenge: perfetto per far emergere collegamenti, estensioni e dubbi reali.</p>
+            <div class="game-foot">
+              <span class="pill">04_bridge-builder_it.html</span>
+              <a class="play-link" href="./04_bridge-builder_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <rect x="7" y="9" width="12" height="12" rx="4" stroke="#71c9ff" stroke-width="2.4"/>
+                  <rect x="29" y="9" width="12" height="12" rx="4" stroke="#2ee6a6" stroke-width="2.4"/>
+                  <rect x="18" y="27" width="12" height="12" rx="4" stroke="#b998ff" stroke-width="2.4"/>
+                  <path d="M19 15h10M13 21l11 7M35 21 24 28" stroke="#ffd166" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="pill">Sistema</span>
+            </div>
+            <h4>Parti · Scopi · Complessità</h4>
+            <p class="one-liner">Guarda un sistema non come “una cosa sola”, ma come una rete di parti, ruoli e interazioni.</p>
+            <p class="desc">Un gioco di pensiero sistemico: aiuta a superare letture semplicistiche e a vedere la struttura sotto la superficie.</p>
+            <div class="game-foot">
+              <span class="pill">05_parts-purposes-complexities_it.html</span>
+              <a class="play-link" href="./05_parts-purposes-complexities_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path d="M12 13h24v9H12z" stroke="#ff5ca8" stroke-width="2.4"/>
+                  <path d="M12 26h24v9H12z" stroke="#71c9ff" stroke-width="2.4"/>
+                  <path d="M18 18h12M18 31h12" stroke="#2ee6a6" stroke-width="2.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="pill">Riflessione</span>
+            </div>
+            <h4>Prima pensavo… Ora so!</h4>
+            <p class="one-liner">Rendi visibile come cambia il tuo pensiero quando incontri una comprensione migliore.</p>
+            <p class="desc">Un gioco di riflessione e cambiamento concettuale: utile per far emergere ciò che davvero si trasforma nella mente dello studente.</p>
+            <div class="game-foot">
+              <span class="pill">06-i-used-to-think-now-i-think_it.html</span>
+              <a class="play-link" href="./06-i-used-to-think-now-i-think_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <div class="game-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path d="M10 24h10" stroke="#b998ff" stroke-width="2.4" stroke-linecap="round"/>
+                  <path d="M28 24h10" stroke="#71c9ff" stroke-width="2.4" stroke-linecap="round"/>
+                  <path d="M21 24h6" stroke="#ffd166" stroke-width="2.4" stroke-dasharray="2 4" stroke-linecap="round"/>
+                  <circle cx="9" cy="24" r="3.2" fill="#b998ff"/>
+                  <circle cx="39" cy="24" r="3.2" fill="#71c9ff"/>
+                </svg>
+              </div>
+              <span class="pill">Revisione</span>
+            </div>
+            <h4>Mind the Gap</h4>
+            <p class="one-liner">Individua il divario tra ciò che pensi e ciò che regge davvero quando viene messo alla prova.</p>
+            <p class="desc">Un gioco più avanzato, pensato per confronto di posizioni, revisione e gestione dell’incertezza.</p>
+            <div class="game-foot">
+              <span class="pill">07_mind-the-gap_it.html</span>
+              <a class="play-link" href="./07_mind-the-gap_it.html">Apri il gioco →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="teachers">
+      <div class="teacher-card">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Per docenti</span>
+            <h3>Una raccolta da usare come percorso, non come vetrina</h3>
+            <p>Questi giochi possono funzionare come ingresso a una lezione, attività esplorativa, routine di pensiero, compito di riflessione o mini-laboratorio di discussione.</p>
+          </div>
+        </div>
+
+        <div class="teacher-grid">
+          <div class="teacher-points">
+            <div class="teacher-point">
+              <strong>1. Non mostrarli tutti insieme</strong>
+              <span>Usali come sequenza: osservazione → inquiry → evidenze → connessioni → sistema → riflessione → revisione.</span>
+            </div>
+            <div class="teacher-point">
+              <strong>2. Fai parlare il thinking trace</strong>
+              <span>Non fermarti al punteggio. Guarda come gli studenti osservano, argomentano, cambiano idea e riformulano.</span>
+            </div>
+            <div class="teacher-point">
+              <strong>3. Trattali come strumenti di comprensione</strong>
+              <span>Non sono semplici giochi “carini”. Sono ambienti per rendere il pensiero più visibile, disciplinato e trasferibile.</span>
+            </div>
+          </div>
+
+          <div class="teacher-points">
+            <div class="teacher-point">
+              <strong>Uso consigliato</strong>
+              <span>Un gioco per volta, con breve debrief finale o confronto scritto/orale. Così il gioco non resta superficie.</span>
+            </div>
+            <div class="teacher-point">
+              <strong>Stato del progetto</strong>
+              <span>Questa versione è ancora in beta testing. Alcuni testi e micro-rifiniture possono essere ancora soggetti a revisione.</span>
+            </div>
+            <div class="teacher-point">
+              <strong>File di supporto</strong>
+              <span>Apri il <a href="./README_it.md" style="text-decoration:underline; text-underline-offset:3px">README_it.md</a> per link, struttura della cartella e note pratiche.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-card">
+      <div>
+        <span class="eyebrow">Footer</span>
+        <h3 style="font-family:'Fraunces',serif; margin:12px 0 10px;">Pensiero visibile. Comprensione che si costruisce.</h3>
+        <p>Un hub pensato per raccogliere giochi che non puntano alla ripetizione meccanica, ma a osservare meglio, pensare meglio e rivedere meglio.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#games">Vai ai giochi</a>
+        <a href="#path">Vai al percorso</a>
+        <a href="./README_it.md">Apri il README</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
