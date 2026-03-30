@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CER Missione · Affermazione · Evidenze · Giustificazione</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c16;--sf:#0f1629;--s2:#161d33;--s3:#1e2844;--brd:rgba(255,255,255,.07);--ng:#00ff9d;--nb:#00d4ff;--np:#ff2d95;--nv:#b14aff;--ny:#ffe234;--no:#ff8534;--nc:#00fff0;--nr:#ff4757;--gg:rgba(0,255,157,.08);--gb:rgba(0,212,255,.08);--gp:rgba(255,45,149,.08);--gv:rgba(177,74,255,.08);--gy:rgba(255,226,52,.08);--gr:rgba(255,71,87,.08);--t:#e0e7f1;--td:#7a8baa;--tb:#fff;--rad:20px;--rs:14px}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 25% 15%,rgba(0,212,255,.06),transparent 40%),radial-gradient(circle at 75% 85%,rgba(0,255,157,.05),transparent 40%),radial-gradient(circle at 50% 50%,rgba(177,74,255,.04),transparent 50%)}
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9999}
+#flash{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;transition:opacity .15s}
+#flash.green{background:radial-gradient(circle,rgba(0,255,157,.18),transparent 70%);opacity:1}
+#flash.red{background:radial-gradient(circle,rgba(255,71,87,.18),transparent 70%);opacity:1}
+#flash.cyan{background:radial-gradient(circle,rgba(0,212,255,.18),transparent 70%);opacity:1}
+
+/* Intro */
+#intro{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:50px 20px;text-align:center;animation:fi .8s ease}
+@keyframes fi{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+#intro h1{font-family:'Fraunces',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;color:var(--tb);line-height:1.15;margin-bottom:16px}
+#intro h1 em{font-style:normal;background:linear-gradient(135deg,var(--nb),var(--ng),var(--nv));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#intro .isub{color:var(--td);font-size:1rem;line-height:1.7;margin-bottom:24px;max-width:580px;margin-inline:auto}
+.intro-steps{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.istep{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rs);padding:14px 12px;width:90px;text-align:center}
+.istep .si{font-size:1.5rem;margin-bottom:6px}.istep .st{font-size:.7rem;font-weight:600;color:var(--tb)}
+.missions-preview{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.mp{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rs);padding:16px;width:200px;text-align:left;cursor:pointer;transition:all .25s}
+.mp:hover{border-color:rgba(0,212,255,.25);transform:translateY(-2px)}
+.mp.sel{border-color:var(--nb);background:var(--gb);box-shadow:0 0 18px rgba(0,212,255,.15)}
+.mp .mp-tag{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--nb);margin-bottom:6px}
+.mp .mp-title{font-size:.9rem;font-weight:700;color:var(--tb);margin-bottom:4px}
+.mp .mp-diff{font-size:.75rem;color:var(--td)}
+.btn-start{font-family:'Outfit',sans-serif;font-weight:700;border:none;border-radius:16px;padding:18px 48px;cursor:pointer;font-size:1.1rem;color:#080c16;background:linear-gradient(135deg,var(--nb),var(--ng));box-shadow:0 6px 30px rgba(0,212,255,.3);transition:all .3s;display:inline-flex;align-items:center;gap:10px}
+.btn-start:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(0,212,255,.4)}
+
+/* Gioco layout */
+.hdr{position:relative;z-index:10;text-align:center;padding:24px 20px 6px}
+.hdr .badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--nb);background:var(--gb);border:1px solid rgba(0,212,255,.15);padding:6px 16px;border-radius:100px;margin-bottom:10px}
+.hdr h1{font-family:'Fraunces',serif;font-size:clamp(1.2rem,3.5vw,1.9rem);font-weight:700;color:var(--tb)}
+.hdr h1 em{font-style:normal;background:linear-gradient(135deg,var(--nb),var(--ng));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wrap{position:relative;z-index:10;max-width:880px;margin:12px auto;padding:0 16px 60px}
+.card{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rad);padding:24px;margin-bottom:14px;box-shadow:0 8px 40px rgba(0,0,0,.4);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--nb),var(--ng),var(--nv));opacity:.6}
+
+/* Pipeline - 7 stages */
+.pipeline{display:flex;align-items:center;gap:0;margin-bottom:14px;background:var(--s2);border-radius:var(--rs);padding:6px 8px;border:1px solid var(--brd);overflow-x:auto}
+.pipe-step{display:flex;align-items:center;gap:3px;padding:5px 8px;border-radius:8px;font-size:.68rem;font-weight:600;color:var(--td);transition:all .3s;white-space:nowrap;flex-shrink:0}
+.pipe-step.active{color:var(--tb);background:rgba(255,255,255,.06)}
+.pipe-step.done{color:var(--ng)}
+.pipe-arrow{color:var(--td);font-size:.55rem;margin:0 1px;opacity:.3;flex-shrink:0}
+
+/* Missione brief */
+.brief-box{background:linear-gradient(135deg,rgba(0,212,255,.05),rgba(0,255,157,.04));border:1px solid rgba(0,212,255,.15);border-radius:var(--rs);padding:16px 18px;margin-bottom:14px}
+.brief-box .bb-title{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--tb);margin-bottom:6px}
+.brief-box .bb-text{font-size:.86rem;color:var(--td);line-height:1.6}
+.brief-box .bb-lens{margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);font-size:.82rem;color:var(--t);line-height:1.5}
+.brief-box .bb-lens strong{color:var(--nb)}
+
+/* Phases */
+.ph{display:none}.ph.on{display:block;animation:su .4s ease}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ph-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1rem;color:var(--tb);margin-bottom:6px}.ph-title .icon{font-size:1.2rem}
+.ph-sub{font-size:.84rem;color:var(--td);margin-bottom:12px;line-height:1.55}
+
+/* Affermazione options */
+.claim-grid{display:grid;gap:10px;margin:12px 0}
+.cl-card{background:var(--s2);border:2px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:14px 16px;color:var(--t);cursor:pointer;transition:all .25s;text-align:left;line-height:1.55;font-size:.88rem}
+.cl-card:hover{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+.cl-card.sel{border-color:var(--nb);background:var(--gb);box-shadow:0 0 18px rgba(0,212,255,.15)}
+.cl-card .cl-label{display:inline-block;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;padding:3px 8px;border-radius:100px;background:rgba(255,255,255,.05);font-weight:700;color:var(--td)}
+
+/* Evidenze cards */
+.ev-grid{display:grid;gap:10px;margin:12px 0}
+.ev-card{background:var(--s2);border:2px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:14px 16px;color:var(--t);cursor:pointer;transition:all .25s;text-align:left}
+.ev-card:hover{border-color:rgba(0,255,157,.25);background:rgba(0,255,157,.04)}
+.ev-card.sel{border-color:var(--ng);background:var(--gg);box-shadow:0 0 14px rgba(0,255,157,.12)}
+.ev-card.reveal{border-style:dashed;border-color:rgba(177,74,255,.25);background:rgba(177,74,255,.04)}
+.ev-card .ev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ev-card .ev-type{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--td);padding:3px 8px;border-radius:100px;background:rgba(255,255,255,.05)}
+.ev-card .ev-rel{font-size:.72rem;color:var(--td)}
+.ev-card .ev-title{font-weight:700;font-size:.9rem;color:var(--tb);margin-bottom:4px}
+.ev-card .ev-body{font-size:.84rem;color:var(--td);line-height:1.5}
+
+/* Collegaors */
+.conn-grid{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.conn-chip{padding:10px 14px;border-radius:100px;border:1.5px solid rgba(255,255,255,.1);background:var(--s2);color:var(--t);font:600 .82rem 'Outfit',sans-serif;cursor:pointer;transition:all .25s}
+.conn-chip:hover{border-color:rgba(177,74,255,.25)}
+.conn-chip.sel{border-color:var(--nv);background:var(--gv);color:var(--nv)}
+
+/* Domanda templates */
+.qt-grid{display:grid;gap:8px;margin:12px 0}
+.qt-card{background:var(--s2);border:2px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:12px 16px;color:var(--t);cursor:pointer;transition:all .25s;font-size:.86rem;line-height:1.5}
+.qt-card:hover{border-color:rgba(255,226,52,.25)}
+.qt-card.sel{border-color:var(--ny);background:var(--gy);color:var(--ny)}
+.qt-card .qt-type{display:inline-block;font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--td);margin-bottom:4px;padding:2px 8px;border-radius:100px;background:rgba(255,255,255,.05)}
+
+/* Slider */
+.slider-wrap{padding:14px;border-radius:var(--rs);border:1px solid var(--brd);background:rgba(255,255,255,.03);margin:12px 0}
+.slider-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.slider-val{font-size:1.4rem;font-weight:700;color:var(--nb)}
+input[type="range"]{flex:1;accent-color:var(--nb)}
+
+/* Rivelazione box */
+.reveal-box{background:linear-gradient(135deg,rgba(177,74,255,.06),rgba(255,45,149,.04));border:1px dashed rgba(177,74,255,.2);border-radius:var(--rs);padding:16px 18px;margin:12px 0}
+.reveal-box strong{color:var(--nv)}
+
+textarea{width:100%;background:var(--s2);border:2px solid rgba(255,255,255,.08);border-radius:var(--rs);color:var(--t);font-family:'Outfit',sans-serif;font-size:.88rem;padding:14px 18px;resize:vertical;min-height:90px;transition:border-color .25s}
+textarea:focus{outline:none;border-color:var(--nb);box-shadow:0 0 16px rgba(0,212,255,.1)}
+textarea::placeholder{color:rgba(255,255,255,.18)}
+
+/* Punteggio cards */
+.score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+@media(max-width:640px){.score-grid{grid-template-columns:1fr}}
+.sc{padding:12px 14px;border-radius:var(--rs);border:1px solid var(--brd);background:rgba(255,255,255,.03)}
+.sc .sc-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--td);font-weight:700}
+.sc .sc-val{font-size:1.3rem;font-weight:700;margin-top:4px}
+
+.btn{font-family:'Outfit',sans-serif;font-weight:600;border:none;border-radius:var(--rs);padding:13px 26px;cursor:pointer;transition:all .25s;font-size:.9rem;display:inline-flex;align-items:center;gap:7px}.btn:active{transform:scale(.96)}
+.btn-blue{background:linear-gradient(135deg,var(--nb),#45deff);color:#091018;font-weight:700;box-shadow:0 4px 16px rgba(0,212,255,.2)}.btn-blue:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,212,255,.3)}
+.btn-green{background:linear-gradient(135deg,var(--ng),#00cc7e);color:#071116;font-weight:700}.btn-green:hover{transform:translateY(-2px)}
+.btn-purple{background:linear-gradient(135deg,var(--nv),#c46aff);color:#0b0f1a;font-weight:700}.btn-purple:hover{transform:translateY(-2px)}
+.btn-ghost{background:transparent;border:1.5px solid rgba(255,255,255,.12);color:var(--t);padding:11px 20px;font-size:.82rem}.btn-ghost:hover{border-color:rgba(255,255,255,.25)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.fb{padding:14px 18px;border-radius:var(--rs);margin-top:14px;font-size:.86rem;line-height:1.65;display:none}.fb.vis{display:block;animation:su .3s ease}
+.fb.good{background:linear-gradient(135deg,rgba(0,255,157,.08),rgba(0,212,255,.05));border:1px solid rgba(0,255,157,.2);color:var(--ng)}
+.fb.tip{background:linear-gradient(135deg,rgba(255,133,52,.08),rgba(255,226,52,.05));border:1px solid rgba(255,133,52,.2);color:var(--no)}
+.fb.inf{background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(177,74,255,.05));border:1px solid rgba(0,212,255,.2);color:var(--nb)}
+
+.res{text-align:center;padding:28px 20px}.res .big{font-family:'Fraunces',serif;font-size:3.5rem;font-weight:700;margin:12px 0;background:linear-gradient(135deg,var(--nb),var(--ng));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.res p{color:var(--td);margin:5px 0}.res .msg{font-size:.94rem;color:var(--t);margin-top:14px;line-height:1.7;max-width:520px;margin-inline:auto}
+.mono{font-family:monospace;font-size:.78rem}
+.mt{margin-top:14px}.hidden{display:none!important}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}.shake{animation:shake .5s ease}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas><div id="flash"></div>
+
+<div id="intro">
+  <h1>🔬 CER Missione<br><em>Affermazione · Evidenze · Giustificazione</em></h1>
+  <p class="isub">Costruisci έναν <strong>υπερασπίσιμο φάκελο</strong> per un φυσικό φαινόμενο. Scegli ισχυρισμό, μάζεψε τεκμήρια, αιτιολόγησε, ρώτησε — e dopo αντιμετώπισε νέα elementi che può να ανατρέψουν τα πάντα!</p>
+  <div class="intro-steps">
+    <div class="istep"><div class="si">💬</div><div class="st">Affermazione</div></div>
+    <div class="istep"><div class="si">📋</div><div class="st">Evidenze</div></div>
+    <div class="istep"><div class="si">🔗</div><div class="st">Giustificazione</div></div>
+    <div class="istep"><div class="si">❓</div><div class="st">Ερώτημα</div></div>
+    <div class="istep"><div class="si">📊</div><div class="st">Sicurezza</div></div>
+    <div class="istep"><div class="si">💥</div><div class="st">Rivelazione</div></div>
+    <div class="istep"><div class="si">📈</div><div class="st">Αξιολόγηση</div></div>
+  </div>
+  <p style="font-size:.85rem;color:var(--td);margin-bottom:16px">Scegli αποστολή:</p>
+  <div class="missions-preview" id="missionSelect"></div>
+  <button class="btn-start" onclick="startGioco()">Inizia la αποστολή →</button>
+  <p style="margin-top:16px;font-size:.78rem;color:var(--td)">3 αποστολές Φυσικής · CER Framework · ~15 minuti</p>
+</div>
+
+<div id="gameScreen" class="hidden">
+<div class="hdr">
+  <div class="badge">Project Zero · CER Missione</div>
+  <h1>Affermazione · Evidenze · <em>Giustificazione</em></h1>
+</div>
+<div class="wrap">
+  <div class="pipeline" id="pipeline"></div>
+  <div class="brief-box" id="briefBox">
+    <div class="bb-title" id="bbTitle"></div>
+    <div class="bb-text" id="bbText"></div>
+    <div class="bb-lens"><strong>Κριτήριο επιτυχίας:</strong> <span id="bbLens"></span></div>
+  </div>
+  <div id="gameArea">
+    <div class="card" id="mainCard">
+
+      <!-- 1. CLAIM -->
+      <div class="ph on" id="phAffermazione">
+        <div class="ph-title"><span class="icon">💬</span> Scegli il ισχυρισμό tuo</div>
+        <p class="ph-sub">Ποιος ισχυρισμός è ο più ακριβής; Μετά, scrivi τη δική tuo διατύπωση.</p>
+        <div class="claim-grid" id="claimGrid"></div>
+        <label style="display:block;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.06em">Η δική tuo διατύπωση:</label>
+        <textarea id="claimDraft" placeholder="Scrivi il ισχυρισμό με δικά tuo λόγια..."></textarea>
+        <div class="row"><button class="btn btn-blue" onclick="nextStage()">Avanti →</button></div>
+        <div class="fb" id="fbAffermazione"></div>
+      </div>
+
+      <!-- 2. EVIDENCE -->
+      <div class="ph" id="phEvidenze">
+        <div class="ph-title"><span class="icon">📋</span> Μάζεψε τεκμήρια</div>
+        <p class="ph-sub">Scegli τα elementi che στηρίζουν <strong>davvero</strong> il ισχυρισμό tuo. Πρόσεξε: κάποια è αναξιόπιστα ή άσχετα!</p>
+        <div class="ev-grid" id="evGrid"></div>
+        <div class="row"><button class="btn btn-blue" onclick="nextStage()">Avanti →</button></div>
+        <div class="fb" id="fbEvidenze"></div>
+      </div>
+
+      <!-- 3. REASONING -->
+      <div class="ph" id="phRagionamento">
+        <div class="ph-title"><span class="icon">🔗</span> Αιτιολόγησε</div>
+        <p class="ph-sub">Collega τα τεκμήρια με il ισχυρισμό. Scegli συνδέσμους e scrivi spiegazione.</p>
+        <p style="font-size:.82rem;color:var(--td);margin-bottom:8px">Scegli almeno 2 συνδέσμους:</p>
+        <div class="conn-grid" id="connGrid"></div>
+        <label style="display:block;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.06em">Η αιτιολόγησή tuo:</label>
+        <textarea id="reasoningText" placeholder="Εξηγώ perché τα τεκμήρια στηρίζουν il ισχυρισμό..."></textarea>
+        <div class="row"><button class="btn btn-blue" onclick="nextStage()">Avanti →</button></div>
+        <div class="fb" id="fbRagionamento"></div>
+      </div>
+
+      <!-- 4. QUESTION -->
+      <div class="ph" id="phDomanda">
+        <div class="ph-title"><span class="icon">❓</span> Θέσε un domanda</div>
+        <p class="ph-sub">Κάθε καλός φάκελος αφήνει ανοιχτά domande. Scegli τύπο e scrivi.</p>
+        <div class="qt-grid" id="qtGrid"></div>
+        <label style="display:block;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--td);text-transform:uppercase;letter-spacing:.06em">Το ερώτημά tuo:</label>
+        <textarea id="questionText" placeholder="Mi chiedo αν..."></textarea>
+        <div class="row"><button class="btn btn-blue" onclick="nextStage()">Avanti →</button></div>
+        <div class="fb" id="fbDomanda"></div>
+      </div>
+
+      <!-- 5. CONFIDENCE -->
+      <div class="ph" id="phConfidence">
+        <div class="ph-title"><span class="icon">📊</span> Πόσο σίγουρος/η είσαι;</div>
+        <p class="ph-sub">Πριν δεις τα νέα elementi, δήλωσε τη βεβαιότητά tuo. Questo μετράει nel σκορ (calibration)!</p>
+        <div class="slider-wrap">
+          <label style="font-size:.82rem;color:var(--td);font-weight:600">Sicurezza prima del reveal:</label>
+          <div class="slider-row"><input type="range" id="confBefore" min="0" max="100" value="50" oninput="document.getElementById('confBeforeVal').textContent=this.value+'%'"><span class="slider-val" id="confBeforeVal">50%</span></div>
+        </div>
+        <div class="row"><button class="btn btn-purple" onclick="nextStage()">Vai al reveal →</button></div>
+      </div>
+
+      <!-- 6. REVEAL + REVISION -->
+      <div class="ph" id="phRivelazione">
+        <div class="ph-title"><span class="icon">💥</span> Rivelazione + Revisione</div>
+        <p class="ph-sub">Nuovi elementi! Rivedi l’affermazione e la tua giustificazione, se necessario.</p>
+        <div class="reveal-box" id="revealContent"></div>
+        <div class="ev-grid" id="revealEvGrid"></div>
+        <label style="display:block;margin-top:14px;font-size:.8rem;font-weight:600;color:var(--td);text-transform:uppercase">Affermazione rivista (se è cambiata):</label>
+        <textarea id="revisedAffermazione" placeholder="Se vuoi, scrivi una nuova formulazione..."></textarea>
+        <label style="display:block;margin-top:10px;font-size:.8rem;font-weight:600;color:var(--td);text-transform:uppercase">Giustificazione rivista:</label>
+        <textarea id="revisedRagionamento" placeholder="Scrivi che cosa cambia dopo i nuovi elementi..."></textarea>
+        <div class="slider-wrap" style="margin-top:14px">
+          <label style="font-size:.82rem;color:var(--td);font-weight:600">Sicurezza dopo il reveal:</label>
+          <div class="slider-row"><input type="range" id="confAfter" min="0" max="100" value="50" oninput="document.getElementById('confAfterVal').textContent=this.value+'%'"><span class="slider-val" id="confAfterVal">50%</span></div>
+        </div>
+        <div class="row"><button class="btn btn-blue" onclick="nextStage()">Chiudi il dossier →</button></div>
+        <div class="fb" id="fbRivelazione"></div>
+      </div>
+
+      <!-- 7. DEBRIEF -->
+      <div class="ph" id="phDebrief">
+        <div id="debriefContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');let confetti=[];
+function rC(){canvas.width=innerWidth;canvas.height=innerHeight}addEventListener('resize',rC);rC();
+function launchConfetti(n=60){const cl=['#00ff9d','#00d4ff','#ff2d95','#b14aff','#ffe234','#ff8534','#00fff0'];for(let i=0;i<n;i++)confetti.push({x:Math.random()*canvas.width,y:canvas.height+10,w:Math.random()*8+4,h:Math.random()*4+2,c:cl[~~(Math.random()*cl.length)],vy:-(Math.random()*12+6),vx:(Math.random()-.5)*6,r:Math.random()*360,rv:(Math.random()-.5)*8,g:.12+Math.random()*.08,l:1})}
+function aniC(){ctx.clearRect(0,0,canvas.width,canvas.height);confetti=confetti.filter(c=>{c.vy+=c.g;c.x+=c.vx;c.y+=c.vy;c.r+=c.rv;c.l-=.005;if(c.l<=0||c.y>canvas.height+20)return false;ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.r*Math.PI/180);ctx.globalAlpha=c.l;ctx.fillStyle=c.c;ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h);ctx.restore();return true});if(confetti.length)requestAnimationFrame(aniC)}
+function flash(c){const f=document.getElementById('flash');f.className=c;setTimeout(()=>f.className='',300)}
+
+const STAGES=['claim','evidence','reasoning','question','confidence','reveal','debrief'];
+const STAGE_LABELS=['Affermazione','Evidenze','Giustificazione','Ερώτημα','Sicurezza','Rivelazione','Αξιολόγηση'];
+const STAGE_ICONS=['💬','📋','🔗','❓','📊','💥','📈'];
+const MISSIONS=[
+{id:'motion_drift',title:'Κίνηση σε ράγα',subject:'Φυσική',difficulty:2,
+brief:'Ένα αμαξίδιο si muove σε ευθεία. Το v–t mostra γραμμική αύξηση da 2 σε 8 m/s σε 3s.',
+lens:'Non basta «η linea ανεβαίνει». Δείξε perché questo significa costante accelerazione.',
+evidence:[
+  {id:'e1',type:'grafico',title:'Γράφημα v–t',body:'Ευθεία linea με costante θετική pendenza.',reliability:.96,tags:['graph','velocity']},
+  {id:'e2',type:'μέτρηση',title:'Τελική velocità 8 m/s',body:'Στο τέλος della καταγραφής η velocità è 8 m/s.',reliability:.84,tags:['value']},
+  {id:'e3',type:'dati',title:'Αυξανόμενες μετατοπίσεις',body:'Σε ίσα χρονικά διαστήματα οι μετατοπίσεις μεγαλώνουν.',reliability:.91,tags:['displacement']},
+  {id:'e4',type:'σχόλιο',title:'⚠️ Βιαστικό συμπέρασμα',body:'«Ευθεία linea = velocità costante» (ΛΑΘΟΣ!)',reliability:.34,tags:['misconception']}
+],
+claims:[
+  {id:'c1',text:'Το corpo si muove με velocità costante (ευθεία nel v–t = ομαλή).',tags:['misconception']},
+  {id:'c2',text:'Το corpo εκτελεί ομαλά επιταχυνόμενη moto.',tags:['target']},
+  {id:'c3',text:'Το corpo αλλάζει κατεύθυνση περιοδικά.',tags:['weak']}
+],bestAffermazione:'c2',strongEvidenze:['e1','e3'],
+connectors:[
+  {id:'r1',word:'επειδή',prompt:'Collega τι mostra η pendenza del v–t.'},
+  {id:'r2',word:'questo significa',prompt:'Εξήγησε τι δείχνουν οι μετατοπίσεις.'},
+  {id:'r3',word:'ωστόσο',prompt:'Quale παρανόηση deve να αποφευχθεί;'}
+],
+reasoningKw:['pendenza','επιτάχυν','γραμμικ','μετατόπισ','σταθερ','αύξηση'],
+questions:[
+  {id:'q1',type:'διευκρίνιση',stem:'Τι άλλο grafico θα βοηθούσε (x–t ή a–t);'},
+  {id:'q2',type:'ελέγξιμη',stem:'Quale μέτρηση θα επιβεβαίωνε costante accelerazione;'},
+  {id:'q3',type:'επέκταση',stem:'Τι αν η pendenza non ήταν costante;'}
+],
+reveal:{title:'Νέο grafico x–t',body:'Εμφανίζεται grafico x–t με καμπύλη che succede ολοένα più απότομη — επιβεβαιώνει accelerazione.',newEvidenze:[{id:'rev1',type:'grafico',title:'x–t καμπύλη',body:'Η pendenza aumenta → η velocità aumenta → accelerazione.',reliability:.95}]},
+funFact:'📊 Ο Γαλιλαίος ήταν ο πρώτος che χρησιμοποίησε συστηματικά γραφήματα motoς!'},
+{id:'circuits_parallel',title:'Παράλληλο circuito',subject:'Φυσική',difficulty:3,
+brief:'Δύο ίδιοι λαμπτήρες συνδέονται in parallelo. Κάποιος λέει: «ogni λαμπτήρας παίρνει τη μισή tensione».',
+lens:'Ξεχώρισε τι μένει stesso (tensione) e τι μοιράζεται (corrente) σε parallelo circuito.',
+evidence:[
+  {id:'e1',type:'δομή',title:'Ίδια due άκρα',body:'Οι due κλάδοι συνδέονται στα stessa άκρα della sorgente.',reliability:.95,tags:['parallel']},
+  {id:'e2',type:'μέτρηση',title:'Ολικό corrente = Ι₁+Ι₂',body:'Το ολικό corrente ισούται με το άθροισμα dei ρευμάτων.',reliability:.94,tags:['current']},
+  {id:'e3',type:'σχόλιο',title:'⚠️ Πρόχειρος ισχυρισμός',body:'«Δύο λαμπτήρες = η tensione μοιράζεται στα due» (ΛΑΘΟΣ!)',reliability:.29,tags:['misconception']},
+  {id:'e4',type:'osservazione',title:'Ίδια φωτεινότητα',body:'Κάθε λαμπτήρας λάμπει όπως soloς del nella stessa sorgente.',reliability:.88,tags:['brightness']}
+],
+claims:[
+  {id:'c1',text:'Σε parallelo: stessa tensione σε ogni κλάδο, corrente μοιράζεται στους κλάδους.',tags:['target']},
+  {id:'c2',text:'Η tensione κόβεται στα due επειδή υπάρχουν due κλάδοι.',tags:['misconception']},
+  {id:'c3',text:'Non ha νόημα corrente ή tensione ανά κλάδο.',tags:['weak']}
+],bestAffermazione:'c1',strongEvidenze:['e1','e2','e4'],
+connectors:[
+  {id:'r1',word:'επειδή',prompt:'Collega stessa άκρα → stessa tensione.'},
+  {id:'r2',word:'επομένως',prompt:'Εξήγησε τι succede με το corrente.'},
+  {id:'r3',word:'ωστόσο',prompt:'Quale λανθασμένη pensiero deve να αποκλειστεί;'}
+],
+reasoningKw:['tensione','stessa','άκρα','κλάδ','corrente','μοιράζ','parallel'],
+questions:[
+  {id:'q1',type:'διευκρίνιση',stem:'Quale μέτρηση tensioneς θα έλυνε τη διαφωνία;'},
+  {id:'q2',type:'ελέγξιμη',stem:'Come θα ελέγχαμε πειραματικά;'},
+  {id:'q3',type:'επέκταση',stem:'Τι αν οι λαμπτήρες non ήταν ίδιοι;'}
+],
+reveal:{title:'Βολτόμετρο σε ogni κλάδο',body:'Μέτρηση: V=12V σε ogni κλάδο, stessa με la sorgente!',newEvidenze:[{id:'rev1',type:'μέτρηση',title:'V κλάδου = V sorgente',body:'Βολτόμετρο σε ogni λαμπτήρα: 12V = tensione sorgente.',reliability:.98}]},
+funFact:'💡 Στα σπίτια μας, όλες οι πρίζες è in parallelo — γι\' questo ogni συσκευή παίρνει 230V!'},
+{id:'quantum_threshold',title:'Φωτοηλεκτρικό soglia',subject:'Φυσική',difficulty:4,
+brief:'Μέταλλο (W=2.2eV) δέχεται molto δυνατό luce με φωτόνια 1.8eV. Κανένα ηλεκτρόνιο. Perché;',
+lens:'Ξεχώρισε energia ανά fotone (hf) da intensità (αριθμός φωτονίων).',
+evidence:[
+  {id:'e1',type:'dati',title:'E φωτονίου = 1.8 eV',body:'Κάθε fotone μεταφέρει 1.8 eV energia.',reliability:.97,tags:['photon']},
+  {id:'e2',type:'dati',title:'Έργο εξαγωγής W = 2.2 eV',body:'Χρειάζονται almeno 2.2 eV per εκπομπή e⁻.',reliability:.98,tags:['threshold']},
+  {id:'e3',type:'μέτρηση',title:'Πολύ μεγάλη intensità',body:'Η δέσμη è εξαιρετικά φωτεινή.',reliability:.88,tags:['intensity']},
+  {id:'e4',type:'σχόλιο',title:'⚠️ Γρήγορο συμπέρασμα',body:'«Πολύ luce = σίγουρα elettroni» (ΛΑΘΟΣ!)',reliability:.25,tags:['misconception']}
+],
+claims:[
+  {id:'c1',text:'Non εκπέμπονται e⁻ perché hf < W (energia φωτονίου < lavoro εξαγωγής).',tags:['target']},
+  {id:'c2',text:'Η μεγάλη intensità basta — το risultato è παράδοξο.',tags:['misconception']},
+  {id:'c3',text:'Η intensità αυξάνει αυτόματα la energia ogni φωτονίου.',tags:['weak']}
+],bestAffermazione:'c1',strongEvidenze:['e1','e2'],
+connectors:[
+  {id:'r1',word:'επειδή',prompt:'Collega E φωτονίου με W.'},
+  {id:'r2',word:'questo significa',prompt:'Perché η intensità non basta;'},
+  {id:'r3',word:'ωστόσο',prompt:'Quale σύγχυση intensità/frequenza deve να αποφευχθεί;'}
+],
+reasoningKw:['φωτόνι','ενέργ','κατώφλ','hf','W','intensità','συχνότ','non basta'],
+questions:[
+  {id:'q1',type:'διευκρίνιση',stem:'Come θα ελέγχαμε αν αλλάξαμε frequenza ή intensità;'},
+  {id:'q2',type:'ελέγξιμη',stem:'Come θα βρίσκαμε la οριακή frequenza;'},
+  {id:'q3',type:'επέκταση',stem:'Τι αν αυξάναμε hf sopra da W αλλά με χαμηλή intensità;'}
+],
+reveal:{title:'Αλλαγή συχνότητας',body:'Με hf=2.4eV (sopra da W=2.2eV), εμφανίζονται elettroni ancora με χαμηλότερη intensità!',newEvidenze:[{id:'rev1',type:'risultato',title:'hf>W → εκπομπή!',body:'Μόλις η energia ανά fotone ξεπέρασε το W, εμφανίστηκαν e⁻ ancora με λιγότερο luce.',reliability:.99}]},
+funFact:'🏆 Questo ακριβώς χάρισε nel Einstein το Nobel (1921) — ΟΧΙ η σχετικότητα!'}
+];
+
+let mIdx=0,sIdx=0,M=null;
+let selAffermazione=null,claimDraft='',selEvIds=[],selConns=[],reasoningText='',selQT=null,questionText='',confBefore=50,confAfter=50,revisedAffermazione='',revisedRagionamento='';
+
+// Build mission select
+document.getElementById('missionSelect').innerHTML=MISSIONS.map((m,i)=>`<div class="mp${i===0?' sel':''}" onclick="selectMissione(${i})" id="mp${i}"><div class="mp-tag">${m.subject}</div><div class="mp-title">${m.title}</div><div class="mp-diff">Δυσκολία: ${'★'.repeat(m.difficulty)}${'☆'.repeat(5-m.difficulty)}</div></div>`).join('');
+function selectMissione(i){mIdx=i;document.querySelectorAll('.mp').forEach((el,idx)=>el.classList.toggle('sel',idx===i))}
+
+function startGioco(){document.getElementById('intro').classList.add('hidden');document.getElementById('gameScreen').classList.remove('hidden');initMissione()}
+function initMissione(){
+  M=JSON.parse(JSON.stringify(MISSIONS[mIdx]));
+  sIdx=0;selAffermazione=null;claimDraft='';selEvIds=[];selConns=[];reasoningText='';selQT=null;questionText='';confBefore=50;confAfter=50;revisedAffermazione='';revisedRagionamento='';
+  document.getElementById('bbTitle').textContent=M.title;
+  document.getElementById('bbText').textContent=M.brief;
+  document.getElementById('bbLens').textContent=M.lens;
+  renderPipeline();showPhase();
+}
+function renderPipeline(){
+  document.getElementById('pipeline').innerHTML=STAGES.map((s,i)=>{
+    let cls='pipe-step';if(i<sIdx)cls+=' done';else if(i===sIdx)cls+=' active';
+    return `<div class="${cls}">${STAGE_ICONS[i]} ${STAGE_LABELS[i]}</div>${i<STAGES.length-1?'<span class="pipe-arrow">→</span>':''}`;
+  }).join('');
+}
+function showPhase(){
+  renderPipeline();
+  STAGES.forEach((s,i)=>{const el=document.getElementById('ph'+s.charAt(0).toUpperCase()+s.slice(1));if(el){el.classList.remove('on');if(i===sIdx)el.classList.add('on')}});
+  if(STAGES[sIdx]==='claim')buildAffermazione();
+  if(STAGES[sIdx]==='evidence')buildEvidenze();
+  if(STAGES[sIdx]==='reasoning')buildRagionamento();
+  if(STAGES[sIdx]==='question')buildDomanda();
+  if(STAGES[sIdx]==='reveal')buildRivelazione();
+  if(STAGES[sIdx]==='debrief')buildDebrief();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildAffermazione(){
+  const g=document.getElementById('claimGrid');g.innerHTML='';
+  M.claims.forEach((c,i)=>{const d=document.createElement('div');d.className='cl-card'+(selAffermazione===c.id?' sel':'');d.innerHTML=`<div class="cl-label">Affermazione ${i+1}</div>${c.text}`;d.onclick=()=>{selAffermazione=c.id;buildAffermazione()};g.appendChild(d)});
+}
+function buildEvidenze(){
+  const g=document.getElementById('evGrid');g.innerHTML='';
+  M.evidence.forEach(e=>{const d=document.createElement('div');d.className='ev-card'+(selEvIds.includes(e.id)?' sel':'');d.innerHTML=`<div class="ev-top"><span class="ev-type">${e.type}</span><span class="ev-rel">αξιοπιστία ${Math.round(e.reliability*100)}%</span></div><div class="ev-title">${e.title}</div><div class="ev-body">${e.body}</div>`;d.onclick=()=>{if(selEvIds.includes(e.id))selEvIds=selEvIds.filter(x=>x!==e.id);else selEvIds.push(e.id);buildEvidenze()};g.appendChild(d)});
+}
+function buildRagionamento(){
+  const g=document.getElementById('connGrid');g.innerHTML='';
+  M.connectors.forEach(c=>{const d=document.createElement('div');d.className='conn-chip'+(selConns.includes(c.id)?' sel':'');d.textContent=c.word+' — '+c.prompt;d.onclick=()=>{if(selConns.includes(c.id))selConns=selConns.filter(x=>x!==c.id);else selConns.push(c.id);buildRagionamento()};g.appendChild(d)});
+}
+function buildDomanda(){
+  const g=document.getElementById('qtGrid');g.innerHTML='';
+  M.questions.forEach(q=>{const d=document.createElement('div');d.className='qt-card'+(selQT===q.id?' sel':'');d.innerHTML=`<div class="qt-type">${q.type}</div>${q.stem}`;d.onclick=()=>{selQT=q.id;buildDomanda()};g.appendChild(d)});
+}
+function buildRivelazione(){
+  document.getElementById('revealContent').innerHTML=`<strong>${M.reveal.title}</strong><br>${M.reveal.body}`;
+  const g=document.getElementById('revealEvGrid');g.innerHTML='';
+  if(M.reveal.newEvidenze){M.reveal.newEvidenze.forEach(e=>{const d=document.createElement('div');d.className='ev-card reveal';d.innerHTML=`<div class="ev-top"><span class="ev-type">nuovo elemento</span><span class="ev-rel">αξιοπιστία ${Math.round(e.reliability*100)}%</span></div><div class="ev-title">${e.title}</div><div class="ev-body">${e.body}</div>`;g.appendChild(d)})}
+}
+
+function showFb(id,type,msg){const el=document.getElementById(id);el.className='fb vis '+type;el.style.display='block';el.innerHTML=msg}
+
+function nextStage(){
+  const key=STAGES[sIdx];
+  // Validate
+  if(key==='claim'){
+    if(!selAffermazione){showFb('fbAffermazione','tip','Scegli έναν ισχυρισμό πρώτα!');return}
+    claimDraft=document.getElementById('claimDraft').value.trim();
+    flash('cyan');
+  }
+  if(key==='evidence'){
+    if(selEvIds.length<2){showFb('fbEvidenze','tip','Χρειάζεσαι almeno 2 τεκμήρια!');return}
+    flash('cyan');
+  }
+  if(key==='reasoning'){
+    reasoningText=document.getElementById('reasoningText').value.trim();
+    if(selConns.length<2||reasoningText.length<30){showFb('fbRagionamento','tip','Scegli 2+ συνδέσμους e scrivi almeno 2 προτάσεις αιτιολόγησης.');return}
+    flash('cyan');
+  }
+  if(key==='question'){
+    questionText=document.getElementById('questionText').value.trim();
+    if(!selQT||questionText.length<10){showFb('fbDomanda','tip','Scegli τύπο ερωτήματος e scrivi almeno una πρόταση.');return}
+    flash('cyan');
+  }
+  if(key==='confidence'){confBefore=parseInt(document.getElementById('confBefore').value);flash('cyan')}
+  if(key==='reveal'){
+    confAfter=parseInt(document.getElementById('confAfter').value);
+    revisedAffermazione=document.getElementById('revisedAffermazione').value.trim();
+    revisedRagionamento=document.getElementById('revisedRagionamento').value.trim();
+    flash('green');
+  }
+  sIdx++;
+  if(sIdx>=STAGES.length)sIdx=STAGES.length-1;
+  showPhase();
+}
+
+function buildDebrief(){
+  const r=scoreMissione();
+  const dc=document.getElementById('debriefContent');
+  const grade=r.total>=78?'Ισχυρός φάκελος!':r.total>=55?'Αξιοπρεπής αλλά ανομοιογενής':'Θέλει δουλειά';
+  const msg=r.total>=78?'Ο φάκελός tuo στέκει. Καθαρός ισχυρισμός, επαρκής αιτιολόγηση, τίμια revisione.'
+    :r.total>=55?'Υπάρχει pensiero, αλλά κάπου η γέφυρα ισχυρισμού-τεκμηρίων-αιτιολόγησης χαλαρώνει.'
+    :'Ο φάκελος ha κενά. Μια corretta διαίσθηση non basta αν non τη στηρίξεις corretto.';
+  const confDelta=confAfter-confBefore;
+  const summary=teacherSummary(r);
+
+  dc.innerHTML=`
+    <div class="res">
+      <p style="font-size:1.1rem;color:var(--tb)">${grade}</p>
+      <div class="big">${r.total}/100</div>
+      <p>${msg}</p>
+      <p style="font-size:.82rem;margin-top:8px">Sicurezza: ${confBefore}% → ${confAfter}% (δ=${confDelta>=0?'+':''}${confDelta}%)</p>
+    </div>
+    <div class="score-grid">
+      ${Object.entries(r.breakdown).map(([k,v])=>`<div class="sc"><div class="sc-label">${friendlyLabel(k)}</div><div class="sc-val" style="color:${v>=70?'var(--ng)':v>=45?'var(--ny)':'var(--nr)'}">${v}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:14px;padding:14px 18px;border-radius:var(--rs);background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.15)">
+      <strong style="color:var(--ng);font-size:.82rem">Ισχυρότερο punto:</strong> <span style="color:var(--t);font-size:.86rem">${r.strongestMove}</span>
+    </div>
+    <div style="margin-top:8px;padding:14px 18px;border-radius:var(--rs);background:rgba(255,71,87,.06);border:1px solid rgba(255,71,87,.15)">
+      <strong style="color:var(--nr);font-size:.82rem">Ασθενέστερο punto:</strong> <span style="color:var(--t);font-size:.86rem">${r.weakestMove}</span>
+    </div>
+    <div style="margin-top:8px;padding:14px 18px;border-radius:var(--rs);background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15)">
+      <strong style="color:var(--nb);font-size:.82rem">Domanda στοχασμού:</strong> <span style="color:var(--t);font-size:.86rem">${r.reflection}</span>
+    </div>
+    ${M.funFact?`<div style="margin-top:8px;padding:12px 16px;border-radius:var(--rs);background:rgba(255,226,52,.06);border:1px solid rgba(255,226,52,.15);font-size:.82rem;color:var(--ny)">${M.funFact}</div>`:''}
+    <div style="margin-top:14px">
+      <label style="font-size:.78rem;font-weight:600;color:var(--td);text-transform:uppercase">Teacher Summary JSON</label>
+      <textarea id="teacherJson" class="mono" style="min-height:120px;margin-top:6px">${JSON.stringify(summary,null,2)}</textarea>
+      <div class="row">
+        <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('teacherJson').value)">Αντιγραφή JSON</button>
+        <button class="btn btn-ghost" onclick="downloadJSON()">Κατέβασμα JSON</button>
+        <button class="btn btn-blue" onclick="restart()">Gioca ξανά 🔄</button>
+      </div>
+    </div>
+  `;
+  launchConfetti(r.total>=60?80:30);aniC();
+}
+
+function scoreMissione(){
+  const ev=M;const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  let claimPrecision=selAffermazione===ev.bestAffermazione?72:20;
+  if(claimDraft.length>=30)claimPrecision+=28;
+  claimPrecision=clamp(claimPrecision,0,100);
+
+  let evRelevance=0,evSuff=0;
+  const strong=ev.strongEvidenze||[];
+  const picked=selEvIds;
+  const goodPicks=picked.filter(id=>strong.includes(id)).length;
+  const badPicks=picked.filter(id=>ev.evidence.find(e=>e.id===id&&e.tags.includes('misconception'))).length;
+  evRelevance=clamp(Math.round(goodPicks/Math.max(strong.length,1)*100 - badPicks*25),0,100);
+  evSuff=clamp(Math.round(picked.length>=2?60+(goodPicks*15):20),0,100);
+
+  let hits=0;(ev.reasoningKw||[]).forEach(k=>{if(reasoningText.toLowerCase().includes(k.toLowerCase()))hits++});
+  let reasoningStrength=clamp(Math.round(hits/(ev.reasoningKw||[]).length*60 + Math.min(reasoningText.length/2,40)),0,100);
+  if(selConns.length>=2)reasoningStrength=Math.min(100,reasoningStrength+15);
+
+  let questionDepth=selQT?40:0;
+  if(questionText.length>=20)questionDepth+=30;
+  if(questionText.length>=50)questionDepth+=20;
+  const qt=ev.questions.find(q=>q.id===selQT);
+  if(qt&&(qt.type==='ελέγξιμη'||qt.type==='επέκταση'))questionDepth+=10;
+  questionDepth=clamp(questionDepth,0,100);
+
+  const confDelta=Math.abs(confAfter-confBefore);
+  let calibration=50;
+  if(confBefore>=70&&selAffermazione===ev.bestAffermazione)calibration=80;
+  if(confBefore<40&&selAffermazione===ev.bestAffermazione)calibration=40;
+  if(confDelta>20)calibration+=15;
+  calibration=clamp(calibration,0,100);
+
+  let revisionQuality=0;
+  if(revisedAffermazione.length>=20)revisionQuality+=35;
+  if(revisedRagionamento.length>=30)revisionQuality+=40;
+  if(confDelta>10)revisionQuality+=25;
+  revisionQuality=clamp(revisionQuality,0,100);
+
+  const breakdown={claimPrecision,evRelevance,evSuff,reasoningStrength,questionDepth,calibration,revisionQuality};
+  const vals=Object.values(breakdown);
+  const total=clamp(Math.round(vals.reduce((a,b)=>a+b,0)/vals.length),0,100);
+  const sorted=Object.entries(breakdown).sort((a,b)=>b[1]-a[1]);
+  const strongestMove=friendlyLabel(sorted[0][0])+': '+friendlyNote(sorted[0][1]);
+  const weakestMove=friendlyLabel(sorted[sorted.length-1][0])+': '+friendlyNote(sorted[sorted.length-1][1]);
+  const reflection=buildRiflettiion(sorted[sorted.length-1][0]);
+  return {total,breakdown,strongestMove,weakestMove,reflection};
+}
+function friendlyLabel(k){return({claimPrecision:'Ακρίβεια ισχυρισμού',evRelevance:'Σχετικότητα τεκμηρίων',evSuff:'Επάρκεια τεκμηρίων',reasoningStrength:'Forza αιτιολόγησης',questionDepth:'Βάθος ερωτήματος',calibration:'Βαθμονόμηση βεβαιότητας',revisionQuality:'Ποιότητα revisioneς'})[k]||k}
+function friendlyNote(v){if(v>=80)return'molto δυνατό punto';if(v>=60)return'στέκεται καλά';if(v>=40)return'θέλει ενίσχυση';return'serve δουλειά'}
+function buildRiflettiion(k){return({claimPrecision:'Come θα έκανες il ισχυρισμό tuo più ακριβή;',evRelevance:'Ποιο τεκμήριο ήταν μάλλον rumoreς;',evSuff:'Τι λείπει da τα elementi tuo;',reasoningStrength:'Ποιος φυσικός legge έπρεπε να αναφερθεί;',questionDepth:'Τι ερώτηση θα άνοιγε davvero τη pensiero;',calibration:'Ήσουν più σίγουρος/η απ\' όσο δικαιολογούσε ο φάκελος;',revisionQuality:'Τι ακριβώς άλλαξες dopo la αποκάλυψη;'})[k]||'Τι θα έκανες διαφορετικά;'}
+
+function teacherSummary(r){return{mission_id:M.id,mission_title:M.title,final_claim_id:selAffermazione,claim_draft:claimDraft,revised_claim:revisedAffermazione,selected_evidence:selEvIds,connectors:selConns,reasoning_length:reasoningText.length,student_question:questionText,confidence_before:confBefore,confidence_after:confAfter,revision_happened:!!(revisedAffermazione||revisedRagionamento),scores:r.breakdown,total:r.total}}
+function downloadJSON(){const blob=new Blob([document.getElementById('teacherJson').value],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=M.id+'_summary.json';a.click();URL.revokeObjectURL(url)}
+function restart(){document.getElementById('gameScreen').classList.add('hidden');document.getElementById('intro').classList.remove('hidden')}
+</script>
+</body>
+</html>

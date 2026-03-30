@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colma il Divario – Project Zero · Colma il Divario</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c16;--sf:#0f1629;--s2:#161d33;--s3:#1e2844;--brd:rgba(255,255,255,.07);--ng:#00ff9d;--nb:#00d4ff;--np:#ff2d95;--nv:#b14aff;--ny:#ffe234;--no:#ff8534;--nc:#00fff0;--nr:#ff4757;--gg:rgba(0,255,157,.08);--gb:rgba(0,212,255,.08);--gp:rgba(255,45,149,.08);--gv:rgba(177,74,255,.08);--gy:rgba(255,226,52,.08);--gr:rgba(255,71,87,.08);--t:#e0e7f1;--td:#7a8baa;--tb:#fff;--rad:20px;--rs:14px}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 25% 15%,rgba(177,74,255,.06),transparent 40%),radial-gradient(circle at 75% 85%,rgba(255,226,52,.05),transparent 40%),radial-gradient(circle at 50% 50%,rgba(0,212,255,.04),transparent 50%)}
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9999}
+#flash{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;transition:opacity .15s}
+#flash.green{background:radial-gradient(circle,rgba(0,255,157,.18),transparent 70%);opacity:1}
+#flash.red{background:radial-gradient(circle,rgba(255,71,87,.18),transparent 70%);opacity:1}
+#flash.purple{background:radial-gradient(circle,rgba(177,74,255,.18),transparent 70%);opacity:1}
+
+#intro{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:50px 20px;text-align:center;animation:fi .8s ease}
+@keyframes fi{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+#intro h1{font-family:'Fraunces',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:700;color:var(--tb);line-height:1.15;margin-bottom:16px}
+#intro h1 em{font-style:normal;background:linear-gradient(135deg,var(--nv),var(--ny),var(--nb));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#intro .isub{color:var(--td);font-size:1rem;line-height:1.7;margin-bottom:28px;max-width:580px;margin-inline:auto}
+.intro-steps{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.istep{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rs);padding:18px;width:145px;text-align:center}
+.istep .si{font-size:2rem;margin-bottom:8px}.istep .st{font-size:.82rem;font-weight:600;color:var(--tb);margin-bottom:3px}.istep .sd{font-size:.72rem;color:var(--td);line-height:1.4}
+.btn-start{font-family:'Outfit',sans-serif;font-weight:700;border:none;border-radius:16px;padding:18px 48px;cursor:pointer;font-size:1.1rem;color:#080c16;background:linear-gradient(135deg,var(--nv),var(--np));box-shadow:0 6px 30px rgba(177,74,255,.3);transition:all .3s;display:inline-flex;align-items:center;gap:10px}
+.btn-start:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 40px rgba(177,74,255,.4)}
+
+.hdr{position:relative;z-index:10;text-align:center;padding:28px 20px 6px}
+.hdr .badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--nv);background:var(--gv);border:1px solid rgba(177,74,255,.15);padding:6px 16px;border-radius:100px;margin-bottom:12px}
+.hdr h1{font-family:'Fraunces',serif;font-size:clamp(1.3rem,4vw,2.2rem);font-weight:700;color:var(--tb);line-height:1.2}
+.hdr h1 em{font-style:normal;background:linear-gradient(135deg,var(--nv),var(--ny));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wrap{position:relative;z-index:10;max-width:880px;margin:12px auto;padding:0 16px 60px}
+.card{background:var(--sf);border:1px solid var(--brd);border-radius:var(--rad);padding:28px;margin-bottom:16px;box-shadow:0 8px 40px rgba(0,0,0,.4);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--nv),var(--ny),var(--nb),var(--ng));opacity:.6}
+.steps{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.sp{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:.72rem;font-weight:600;background:var(--s2);color:var(--td);border:1.5px solid transparent;transition:all .35s}
+.sp.on{border-color:var(--nv);color:var(--nv);background:var(--gv);box-shadow:0 0 12px rgba(177,74,255,.15)}
+.sp.ok{border-color:rgba(0,255,157,.3);color:var(--ng);background:rgba(0,255,157,.06)}
+.sp .n{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:700;background:var(--s3);transition:all .3s}
+.sp.on .n{background:var(--nv);color:var(--bg)}.sp.ok .n{background:var(--ng);color:var(--bg);opacity:.7}
+.sbar{display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--s2);border-radius:var(--rs);margin-bottom:14px;font-size:.84rem;border:1px solid var(--brd);flex-wrap:wrap}
+.sbar .lb{color:var(--td)}.sbar .vl{font-weight:700;font-size:1rem}
+.sbar .purple{color:var(--nv)}.sbar .yellow{color:var(--ny)}
+.pbar{flex:1;min-width:80px;height:6px;background:var(--s3);border-radius:100px;overflow:hidden}
+.pfill{height:100%;border-radius:100px;transition:width .6s;width:0%;background:linear-gradient(90deg,var(--nv),var(--ny),var(--nb))}
+.streak{display:flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:.78rem;font-weight:600;background:var(--gy);color:var(--ny);border:1px solid rgba(255,226,52,.15)}.streak.hidden{display:none}
+.gap-badge{display:flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:.78rem;font-weight:600;background:var(--gv);color:var(--nv);border:1px solid rgba(177,74,255,.15)}.gap-badge.hidden{display:none}
+
+.pipeline{display:flex;align-items:center;gap:0;margin-bottom:18px;background:var(--s2);border-radius:var(--rs);padding:8px 10px;border:1px solid var(--brd)}
+.pipe-step{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:.76rem;font-weight:600;color:var(--td);transition:all .3s;flex:1;justify-content:center}
+.pipe-step.active{color:var(--tb);background:rgba(255,255,255,.06)}.pipe-step.done{color:var(--ng)}
+.pipe-arrow{color:var(--td);font-size:.65rem;margin:0 1px;opacity:.35}
+
+.scene{width:100%;border-radius:var(--rs);background:linear-gradient(180deg,var(--s2),var(--s3));border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;min-height:200px;margin-bottom:18px;overflow:hidden;position:relative;padding:16px}
+.scene svg{width:100%;max-width:580px;height:auto;display:block}
+.scene-tag{position:absolute;top:12px;left:14px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:4px 12px;border-radius:8px;color:var(--nv);background:var(--gv);border:1px solid rgba(177,74,255,.16)}
+
+.gap-banner{background:linear-gradient(135deg,rgba(177,74,255,.08),rgba(255,226,52,.05));border:1px solid rgba(177,74,255,.15);border-radius:var(--rs);padding:16px 20px;margin-bottom:18px}
+.gap-banner .gb-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--nv);margin-bottom:6px}
+.gap-banner .gb-q{font-size:1rem;font-weight:600;color:var(--tb);line-height:1.5}
+
+.ph{display:none}.ph.on{display:block;animation:su .4s ease}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ph-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1rem;color:var(--tb);margin-bottom:6px}.ph-title .icon{font-size:1.2rem}
+.ph-sub{font-size:.84rem;color:var(--td);margin-bottom:12px;line-height:1.55}
+
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+@media(max-width:640px){.choice-grid{grid-template-columns:1fr}}
+.opt-card{background:var(--s2);border:2px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:15px 18px;color:var(--t);cursor:pointer;transition:all .25s;text-align:left;line-height:1.55;font-size:.88rem}
+.opt-card:hover{transform:translateY(-1px);border-color:rgba(177,74,255,.25);background:rgba(177,74,255,.04)}
+.opt-card.sel{border-color:var(--nv);background:var(--gv);box-shadow:0 0 18px rgba(177,74,255,.15)}
+.opt-card.right{border-color:var(--ng)!important;background:var(--gg)!important;color:var(--ng)!important}
+.opt-card.wrong{border-color:var(--nr)!important;background:var(--gr)!important;color:var(--nr)!important;opacity:.55}
+.opt-card[disabled]{pointer-events:none}
+.opt-card .opt-label{display:inline-block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,.05);font-weight:700;color:var(--td)}
+
+/* Viewpoint cards */
+.viewpoint{background:var(--s2);border:1px solid rgba(255,255,255,.06);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;position:relative}
+.viewpoint .vp-name{font-weight:700;font-size:.85rem;color:var(--tb);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.viewpoint .vp-name .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.viewpoint .vp-text{font-size:.86rem;color:var(--t);line-height:1.6;font-style:italic}
+.viewpoint .vp-tag{position:absolute;top:12px;right:14px;font-size:.68rem;padding:3px 8px;border-radius:100px;font-weight:600}
+.vp-surface .vp-tag{background:var(--gr);color:var(--nr)}
+.vp-deep .vp-tag{background:var(--gg);color:var(--ng)}
+.vp-partial .vp-tag{background:var(--gy);color:var(--ny)}
+
+/* Evaluate buttons on viewpoints */
+.vp-eval{display:flex;gap:6px;margin-top:10px}
+.vp-btn{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:var(--s3);color:var(--t);font:600 .78rem 'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.vp-btn:hover{border-color:rgba(177,74,255,.25)}
+.vp-btn.chosen{border-color:var(--nv);background:var(--gv);color:var(--nv)}
+
+textarea{width:100%;background:var(--s2);border:2px solid rgba(255,255,255,.08);border-radius:var(--rs);color:var(--t);font-family:'Outfit',sans-serif;font-size:.9rem;padding:14px 18px;resize:vertical;min-height:80px;transition:border-color .25s,box-shadow .25s}
+textarea:focus{outline:none;border-color:var(--nv);box-shadow:0 0 16px rgba(177,74,255,.1)}
+textarea::placeholder{color:rgba(255,255,255,.18)}
+
+/* Riflettiion choices */
+.reflect-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
+.ref-card{background:var(--s2);border:2px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:14px 16px;color:var(--t);cursor:pointer;transition:all .25s;line-height:1.5;font-size:.86rem}
+.ref-card:hover{border-color:rgba(255,226,52,.25);background:rgba(255,226,52,.04)}
+.ref-card.sel{border-color:var(--ny);background:var(--gy);color:var(--ny)}
+
+.btn{font-family:'Outfit',sans-serif;font-weight:600;border:none;border-radius:var(--rs);padding:13px 26px;cursor:pointer;transition:all .25s;font-size:.9rem;display:inline-flex;align-items:center;gap:7px}.btn:active{transform:scale(.96)}
+.btn-purple{background:linear-gradient(135deg,var(--nv),#c46aff);color:#0b0f1a;font-weight:700;box-shadow:0 4px 16px rgba(177,74,255,.2)}.btn-purple:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(177,74,255,.3)}
+.btn-ghost{background:transparent;border:1.5px solid rgba(255,255,255,.12);color:var(--t);padding:11px 20px;font-size:.82rem}.btn-ghost:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.fb{padding:14px 18px;border-radius:var(--rs);margin-top:14px;font-size:.86rem;line-height:1.65;display:none}.fb.vis{display:block;animation:su .3s ease}
+.fb.good{background:linear-gradient(135deg,rgba(0,255,157,.08),rgba(0,212,255,.05));border:1px solid rgba(0,255,157,.2);color:var(--ng)}
+.fb.tip{background:linear-gradient(135deg,rgba(255,133,52,.08),rgba(255,226,52,.05));border:1px solid rgba(255,133,52,.2);color:var(--no)}
+.fb.inf{background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(177,74,255,.05));border:1px solid rgba(0,212,255,.2);color:var(--nb)}
+.fb.wrong{background:linear-gradient(135deg,rgba(255,71,87,.08),rgba(255,45,149,.05));border:1px solid rgba(255,71,87,.2);color:var(--nr)}
+.key-concept{margin-top:12px;padding:14px 18px;border-radius:var(--rs);font-size:.84rem;line-height:1.6;background:linear-gradient(135deg,rgba(177,74,255,.08),rgba(0,212,255,.05));border:1px solid rgba(177,74,255,.2);color:var(--nv);display:none}.key-concept.vis{display:block;animation:su .4s ease}.key-concept strong{color:var(--tb)}
+.fun-fact{margin-top:10px;padding:12px 16px;border-radius:var(--rs);font-size:.82rem;line-height:1.55;background:linear-gradient(135deg,rgba(255,226,52,.06),rgba(255,133,52,.04));border:1px solid rgba(255,226,52,.15);color:var(--ny);display:none}.fun-fact.vis{display:block;animation:su .5s ease}
+.res{text-align:center;padding:32px 20px}.res .big{font-family:'Fraunces',serif;font-size:3.8rem;font-weight:700;margin:14px 0;background:linear-gradient(135deg,var(--nv),var(--ny));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.res p{color:var(--td);margin:5px 0}.res .msg{font-size:.94rem;color:var(--t);margin-top:14px;line-height:1.7;max-width:520px;margin-inline:auto}
+.stats{display:flex;justify-content:center;gap:16px;margin-top:18px;flex-wrap:wrap}.stat-card{background:var(--s2);border:1px solid var(--brd);border-radius:var(--rs);padding:14px 20px;min-width:100px;text-align:center}.stat-card .stat-val{font-size:1.5rem;font-weight:700}.stat-card .stat-label{font-size:.74rem;color:var(--td);margin-top:4px}
+.breakdown{margin-top:18px;text-align:left;max-width:500px;margin-inline:auto}.breakdown h3{font-size:.85rem;font-weight:600;color:var(--tb);margin-bottom:10px;text-align:center}
+.bd-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem}.bd-topic{flex:1;color:var(--t)}.bd-r{font-weight:700;font-size:.85rem}.bd-r.ok{color:var(--ng)}.bd-r.fail{color:var(--nr)}.bd-r.shift{color:var(--nv)}
+.mt{margin-top:14px}.hidden{display:none!important}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}.shake{animation:shake .5s ease}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas><div id="flash"></div>
+
+<div id="intro">
+  <h1>🌉 Γεφύρωσε<br><em>il divario</em></h1>
+  <p class="isub">Βασισμένο nel <strong>Colma il Divario</strong> del Harvard Project Zero. Prendi posizione, άκουσε διαφορετικές απόψεις, αναθεώρησε τη pensiero tuo, e αναλογίσου πώς άλλαξες. Questoς è ο κύκλος della βαθιάς μάθησης!</p>
+  <div class="intro-steps">
+    <div class="istep"><div class="si">💡</div><div class="st">Impegnati</div><div class="sd">Prendi posizione σε un domanda</div></div>
+    <div class="istep"><div class="si">👥</div><div class="st">Confronta</div><div class="sd">Guarda che cosa dicono “altri studenti”</div></div>
+    <div class="istep"><div class="si">🔄</div><div class="st">Riformula</div><div class="sd">Rivedi il tuo pensiero</div></div>
+    <div class="istep"><div class="si">🪞</div><div class="st">Rifletti</div><div class="sd">Come è cambiato il tuo pensiero?</div></div>
+  </div>
+  <button class="btn-start" onclick="startGioco()">Inizia il percorso →</button>
+  <p style="margin-top:16px;font-size:.78rem;color:var(--td)">5 scenari Φυσικής · Livello scuola superiore · ~15 minuti</p>
+</div>
+
+<div id="gameScreen" class="hidden">
+<div class="hdr">
+  <div class="badge">Project Zero · Colma il Divario</div>
+  <h1>Γεφύρωσε <em>il divario</em></h1>
+</div>
+<div class="wrap">
+  <div class="steps" id="steps"></div>
+  <div class="sbar">
+    <span class="lb">Scenario</span><span class="vl purple" id="snum">1/5</span>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <span class="lb">Punti</span><span class="vl yellow" id="score">0</span>
+    <div class="gap-badge hidden" id="gapBadge">🌉 <span id="gapNum">0</span> gaps bridged</div>
+  </div>
+  <div id="gameArea">
+    <div class="card" id="mainCard">
+      <div class="pipeline">
+        <div class="pipe-step active" id="pipe0"><span>💡</span> Impegnati</div><span class="pipe-arrow">→</span>
+        <div class="pipe-step" id="pipe1"><span>👥</span> Confronta</div><span class="pipe-arrow">→</span>
+        <div class="pipe-step" id="pipe2"><span>🔄</span> Riformula</div><span class="pipe-arrow">→</span>
+        <div class="pipe-step" id="pipe3"><span>🪞</span> Rifletti</div>
+      </div>
+      <div class="scene"><span class="scene-tag" id="sceneTag"></span><div id="sceneImg"></div></div>
+      <div class="gap-banner"><div class="gb-label">Το domanda</div><div class="gb-q" id="gapQ"></div></div>
+
+      <!-- Phase 1: Commit -->
+      <div class="ph on" id="phCommit">
+        <div class="ph-title"><span class="icon">💡</span> Prendi posizione</div>
+        <p class="ph-sub">Scegli ciò che pensi sia vero, senza pensarci troppo. La tua idea iniziale conta!</p>
+        <div class="choice-grid" id="commitGrid"></div>
+        <div class="row"><button class="btn btn-purple" onclick="submitCommit()">Mi impegno →</button></div>
+        <div class="fb" id="fbCommit"></div>
+      </div>
+
+      <!-- Phase 2: Negotiate -->
+      <div class="ph" id="phNegotiate">
+        <div class="ph-title"><span class="icon">👥</span> Ascolta i tuoi “compagni di classe”</div>
+        <p class="ph-sub">Tre studenti hanno punti di vista diversi. Valuta ciascuno: è <strong>superficiale</strong>, <strong>parzialmente corretto</strong> o segno di <strong>comprensione profonda</strong>?</p>
+        <div id="viewpoints"></div>
+        <div class="row"><button class="btn btn-purple" onclick="submitNegotiate()">Ho valutato, avanti →</button></div>
+        <div class="fb" id="fbNeg"></div>
+      </div>
+
+      <!-- Phase 3: Rivedi -->
+      <div class="ph" id="phRivedi">
+        <div class="ph-title"><span class="icon">🔄</span> Riformula il tuo pensiero</div>
+        <p class="ph-sub">Dopo il “confronto”, qual è ora la risposta corretta? Spiega perché usando termini scientifici.</p>
+        <div class="choice-grid" id="reviseGrid"></div>
+        <textarea id="reviseText" placeholder="Spiego perché questa risposta è corretta..."></textarea>
+        <div class="row"><button class="btn btn-purple" onclick="submitRivedi()">Invia →</button></div>
+        <div class="fb" id="fbRivedi"></div>
+      </div>
+
+      <!-- Phase 4: Rifletti -->
+      <div class="ph" id="phRifletti">
+        <div class="ph-title"><span class="icon">🪞</span> Riflessione</div>
+        <p class="ph-sub">Rifletti sul <strong>processo</strong> del tuo pensiero. Quale frase descrive meglio ciò che è successo?</p>
+        <div class="reflect-grid" id="reflectGrid"></div>
+        <div class="row"><button class="btn btn-purple" onclick="submitRifletti()">Completamento →</button></div>
+        <div class="fb" id="fbRifletti"></div>
+        <div class="key-concept" id="keyConcept"></div>
+        <div class="fun-fact" id="funFact"></div>
+        <div class="row hidden" id="nextRow"><button class="btn btn-purple" onclick="nextScenario()">Avanti scenario →</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card hidden" id="resCard">
+    <div class="res">
+      <p style="font-size:1.15rem;color:var(--tb)">Hai completato il κύκλο!</p>
+      <div class="big" id="resBig">0/5</div><p>Divarioτα γεφυρωμένα</p>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-val" style="color:var(--ny)" id="resPts">0</div><div class="stat-label">Punti</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--nv)" id="resGaps">0</div><div class="stat-label">Gaps bridged</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--nb)" id="resShifts">0</div><div class="stat-label">Mind shifts</div></div>
+      </div>
+      <div class="breakdown" id="breakdown"><h3>Ανά scenario</h3></div>
+      <p class="msg" id="resMsg"></p>
+      <div class="mt"><button class="btn btn-purple" onclick="restart()" style="font-size:1rem;padding:16px 36px">Gioca ξανά 🔄</button></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');let confetti=[];
+function rC(){canvas.width=innerWidth;canvas.height=innerHeight}addEventListener('resize',rC);rC();
+function launchConfetti(n=60){const cl=['#00ff9d','#00d4ff','#ff2d95','#b14aff','#ffe234','#ff8534','#00fff0'];for(let i=0;i<n;i++)confetti.push({x:Math.random()*canvas.width,y:canvas.height+10,w:Math.random()*8+4,h:Math.random()*4+2,c:cl[~~(Math.random()*cl.length)],vy:-(Math.random()*12+6),vx:(Math.random()-.5)*6,r:Math.random()*360,rv:(Math.random()-.5)*8,g:.12+Math.random()*.08,l:1})}
+function aniC(){ctx.clearRect(0,0,canvas.width,canvas.height);confetti=confetti.filter(c=>{c.vy+=c.g;c.x+=c.vx;c.y+=c.vy;c.r+=c.rv;c.l-=.005;if(c.l<=0||c.y>canvas.height+20)return false;ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.r*Math.PI/180);ctx.globalAlpha=c.l;ctx.fillStyle=c.c;ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h);ctx.restore();return true});if(confetti.length)requestAnimationFrame(aniC)}
+function flash(c){const f=document.getElementById('flash');f.className=c;setTimeout(()=>f.className='',300)}
+
+const DATA=[
+{tag:'Ελεύθερη πτώση',question:'Δύο sfere — 1kg e 10kg — πέφτουν ταυτόχρονα nel vuoto. Quale φτάνει πρώτη;',
+svg:'<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="260" fill="#111827" rx="14"/><line x1="40" y1="230" x2="520" y2="230" stroke="#334155" stroke-width="2"/><circle cx="180" cy="60" r="16" fill="#ffe234"/><text x="180" y="40" text-anchor="middle" fill="#ffe234" font-size="10" font-weight="700">1 kg</text><circle cx="380" cy="60" r="28" fill="#ff2d95" opacity=".85"/><text x="380" y="35" text-anchor="middle" fill="#ff2d95" font-size="10" font-weight="700">10 kg</text><text x="280" y="250" text-anchor="middle" fill="#7a8baa" font-size="10">Κενό — senza resistenza aria</text></svg>',
+opts:[{label:'Α',text:'Η βαριά (10kg) φτάνει πρώτη'},{label:'Β',text:'Φτάνουν ταυτόχρονα'},{label:'Γ',text:'Η ελαφριά (1kg) φτάνει πρώτη'}],
+correct:1,
+viewpoints:[
+  {name:'Μαρία',avatar:'👩‍🔬',text:'Η βαρύτερη cade più rapidamente, perché η gravità la τραβάει più δυνατά.',type:'surface',eval:'Επιφανειακή'},
+  {name:'Κώστας',avatar:'🧑‍💻',text:'Στο vuoto non υπάρχει resistenza aria, quindi πέφτουν stessa. Αλλά non so perché ακριβώς.',type:'partial',eval:'Μερικώς corretta'},
+  {name:'Ελένη',avatar:'👩‍🏫',text:'Η accelerazione g è stessa per όλα τα corpi ανεξαρτήτως massa. Η βαρύτερη δέχεται μεν maggiore forza (F=mg), αλλά ha e maggiore inerzia (m), quindi a=F/m=g.',type:'deep',eval:'Βαθιά comprensione'}
+],
+reviseKw:['stessa','ταυτόχρονα','g','accelerazione','inerzia','massa','vuoto'],
+reviseExplain:'Στο vuoto, a=g per ΟΛΕΣ le μάζες. Η maggiore forza (F=mg) αντισταθμίζεται ακριβώς da τη maggiore inerzia.',
+reflectOptions:['Η αρχική mio pensiero ήταν corretta e η discussione la επιβεβαίωσε','Είχα λάθος αρχική idea — η «discussione» με βοήθησε να καταλάβω che η inerzia αντισταθμίζει τη forza','Non κατάλαβα πολλά, χρειάζομαι περισσότερο χρόνο','Η spiegazione della Ελένης mio άλλαξε τη pensiero perché συνέδεσε forza e inerzia'],
+keyConcept:'<strong>Colma il Divario:</strong> Η επιφανειακή pensiero λέει «βαρύ = cade rapidamente». Η βαθιά comprensione λέει «a=F/m=mg/m=g = stessa per όλους». Το divario γεφυρώνεται quando collegamenti forza με inerzia.',
+funFact:'🌙 Ο αστροναύτης David Scott (Apollo 15) έκανε questo το πείραμα nel Φεγγάρι — σφυρί e φτερό έπεσαν μαζί!'},
+{tag:'Νόμοι Newton',question:'Ένα αυτοκίνητο si muove με velocità costante σε ευθεία. Qual è risultante forza;',
+svg:'<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="260" fill="#111827" rx="14"/><rect x="180" y="140" width="200" height="60" rx="12" fill="#00d4ff" opacity=".7"/><circle cx="220" cy="210" r="16" fill="#334155" stroke="#7a8baa" stroke-width="2"/><circle cx="340" cy="210" r="16" fill="#334155" stroke="#7a8baa" stroke-width="2"/><line x1="130" y1="170" x2="170" y2="170" stroke="#00ff9d" stroke-width="3" marker-end="url(#a1)"/><text x="120" y="160" fill="#00ff9d" font-size="9" font-weight="700">v = σταθ.</text><text x="280" y="245" text-anchor="middle" fill="#7a8baa" font-size="10">Ευθύγραμμη ομαλή moto</text><defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#00ff9d"/></marker></defs></svg>',
+opts:[{label:'Α',text:'Θετική (verso τα εμπρός) — αφού si muove'},{label:'Β',text:'Μηδέν — velocità costante significa zero accelerazione'},{label:'Γ',text:'Ίση με το peso'}],
+correct:1,
+viewpoints:[
+  {name:'Γιάννης',avatar:'🧑‍🎓',text:'Αφού si muove, κάποια forza deve να το σπρώχνει μπροστά. Άρα η risultante è θετική.',type:'surface',eval:'Επιφανειακή'},
+  {name:'Σοφία',avatar:'👩‍💻',text:'Ο κινητήρας dà forza, αλλά η τριβή αντιστέκεται. Μάλλον ισοσκελίζονται;',type:'partial',eval:'Μερικώς corretta'},
+  {name:'Δημήτρης',avatar:'🧑‍🔬',text:'1ος legge Newton: velocità costante = zero accelerazione = zero risultante. Ο κινητήρας ισοσταθμίζει ακριβώς le resistenze.',type:'deep',eval:'Βαθιά comprensione'}
+],
+reviseKw:['zero','costante','1ος legge','inerzia','Newton','ισοσταθμ','ισοσκελ','accelerazione'],
+reviseExplain:'Σταθερή velocità → a=0 → ΣF=0. Forza serve per ΑΛΛΑΓΗ velocitàς, όχι per διατήρηση.',
+reflectOptions:['Ήξερα ήδη che ΣF=0 — η discussione απλώς επιβεβαίωσε','Πίστευα «moto = forza» αλλά ora καταλαβαίνω che forza = cambiamento velocitàς','Η pensiero mio non άλλαξε molto','Ο Δημήτρης mio έδειξε che ο κινητήρας non «κινεί» — αντισταθμίζει attriti'],
+keyConcept:'<strong>Divario:</strong> «moto = serve forza» (Αριστοτέλης) vs «cambiamento motoς = forza» (Newton). Το divario κλείνει quando ξεχωρίσεις velocità da accelerazione.',
+funFact:'🚀 Τα Voyager ταξιδεύουν 45+ χρόνια nel διάστημα senza κινητήρες — inerzia nel vuoto!'},
+{tag:'Ρεύμα σε circuito',question:'Σε circuito serieς με 2 λαμπτήρες, το corrente prima il 2ο λαμπτήρα è μικρότερο da prima il 1ο;',
+svg:'<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="260" fill="#111827" rx="14"/><rect x="60" y="80" width="44" height="80" rx="8" fill="#1e293b" stroke="#ffe234" stroke-width="2"/><text x="82" y="115" text-anchor="middle" fill="#ffe234" font-size="10" font-weight="700">12V</text><line x1="104" y1="100" x2="200" y2="100" stroke="#00ff9d" stroke-width="2"/><circle cx="230" cy="100" r="16" fill="#ffe234" opacity=".5"/><text x="230" y="130" text-anchor="middle" fill="#ffe234" font-size="8">Λ₁</text><line x1="246" y1="100" x2="340" y2="100" stroke="#00ff9d" stroke-width="2"/><circle cx="370" cy="100" r="16" fill="#ffe234" opacity=".5"/><text x="370" y="130" text-anchor="middle" fill="#ffe234" font-size="8">Λ₂</text><line x1="386" y1="100" x2="460" y2="100" stroke="#00ff9d" stroke-width="2"/><line x1="460" y1="100" x2="460" y2="190" stroke="#00ff9d" stroke-width="2"/><line x1="460" y1="190" x2="82" y2="190" stroke="#00ff9d" stroke-width="2"/><line x1="82" y1="190" x2="82" y2="160" stroke="#00ff9d" stroke-width="2"/><text x="280" y="240" text-anchor="middle" fill="#7a8baa" font-size="10">Circuito in serie</text></svg>',
+opts:[{label:'Α',text:'Ναι — ο 1ος «καταναλώνει» parte del correnteτος'},{label:'Β',text:'Όχι — το corrente è stesso παντού nella serie'},{label:'Γ',text:'Εξαρτάται da τη φωτεινότητα'}],
+correct:1,
+viewpoints:[
+  {name:'Αλέξης',avatar:'🧑‍🎓',text:'Ο πρώτος λαμπτήρας "τρώει" corrente, γι\' questo ο δεύτερος φωτίζει λιγότερο.',type:'surface',eval:'Επιφανειακή'},
+  {name:'Νίκη',avatar:'👩‍💻',text:'Νομίζω che σε serie το corrente μένει stesso, αλλά non είμαι σίγουρη perché.',type:'partial',eval:'Μερικώς corretta'},
+  {name:'Παναγιώτης',avatar:'🧑‍🔬',text:'Σε serie, non υπάρχουν διακλαδώσεις. Το stesso carica περνά da ogni elemento. Questo che μετατρέπεται στους λαμπτήρες non è corrente αλλά energia ανά carica (tensione).',type:'deep',eval:'Βαθιά comprensione'}
+],
+reviseKw:['stesso','serie','tensione','energia','carica','non ξοδεύεται','non τρώει','corrente'],
+reviseExplain:'Σε serie: I stesso παντού. Ο λαμπτήρας non «τρώει» corrente — μετατρέπει ηλεκτρική energia (tensione cade, corrente μένει).',
+reflectOptions:['Ήξερα che I=stesso σε serie — η discussione επιβεβαίωσε','Πίστευα che το corrente «ξοδεύεται» — ora so che η tensione αλλάζει, όχι το corrente','Η pensiero mio non άλλαξε','Ο Παναγιώτης mio έδειξε τη διαφορά correnteτος vs tensioneς'],
+keyConcept:'<strong>Divario:</strong> «corrente ξοδεύεται» (λανθασμένο modello) vs «energia ανά carica μετατρέπεται» (corretto). Το divario κλείνει quando ξεχωρίσεις corrente (I) da tensione (V).',
+funFact:'💡 Στην πραγματικότητα, τα elettroni κινούνται molto αργά (~0.1 mm/s) — è το ηλεκτρικό πεδίο che εξαπλώνεται αστραπιαία!'},
+{tag:'Energia',question:'Αν ρίξεις μπάλα da 10m altezza e ξαναπηδήξει, θα φτάσει ξανά στα 10m;',
+svg:'<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="260" fill="#111827" rx="14"/><line x1="40" y1="230" x2="520" y2="230" stroke="#334155" stroke-width="2"/><circle cx="150" cy="50" r="16" fill="#ff2d95"/><text x="150" y="35" text-anchor="middle" fill="#ff2d95" font-size="9" font-weight="700">10m</text><line x1="150" y1="70" x2="150" y2="220" stroke="#ff2d95" stroke-width="1.5" stroke-dasharray="5,4"/><text x="130" y="140" fill="#ff2d95" font-size="9">↓ πτώση</text><circle cx="300" cy="230" r="16" fill="#00d4ff" opacity=".6"/><text x="300" y="250" text-anchor="middle" fill="#00d4ff" font-size="9">αναπήδηση</text><circle cx="420" cy="90" r="16" fill="#ffe234" opacity=".5"/><text x="420" y="75" text-anchor="middle" fill="#ffe234" font-size="9">; m</text><line x1="420" y1="110" x2="420" y2="220" stroke="#ffe234" stroke-width="1.5" stroke-dasharray="5,4"/></svg>',
+opts:[{label:'Α',text:'Ναι — η energia διατηρείται'},{label:'Β',text:'Όχι — ogni αναπήδηση χάνει energia σε calore/ήχο'},{label:'Γ',text:'Εξαρτάται solo da τη massa'}],
+correct:1,
+viewpoints:[
+  {name:'Ιωάννα',avatar:'👩‍🎓',text:'Η energia διατηρείται πάντα, quindi θα φτάσει πάλι στα 10m.',type:'surface',eval:'Επιφανειακή'},
+  {name:'Στέφανος',avatar:'🧑‍💻',text:'Η μπάλα χάνει altezza ogni φορά, μάλλον λόγω qualcosa come τριβή;',type:'partial',eval:'Μερικώς corretta'},
+  {name:'Χριστίνα',avatar:'👩‍🔬',text:'Η ΟΛΙΚΗ energia διατηρείται, αλλά parte μετατρέπεται σε calore e ήχο contro la κρούση. Η ΜΗΧΑΝΙΚΗ energia diminuisce. Γι\' questo ogni αναπήδηση πιάνει λιγότερο altezza.',type:'deep',eval:'Βαθιά comprensione'}
+],
+reviseKw:['θερμότ','ήχο','μηχανική','totale','μετατρ','κρούση','χάνεται','diminuisce','ανελαστική'],
+reviseExplain:'Η totale energia διατηρείται, αλλά η μηχανική (Eκ+Eδ) diminuisce perché parte succede calore nella κρούση.',
+reflectOptions:['Ήξερα τη διαφορά ολικής vs μηχανικής energia','Πίστευα «energia = πάντα stessa» αλλά ora so che η ΜΗΧΑΝΙΚΗ diminuisce σε μη ελαστική κρούση','Non είμαι σίγουρος/η ancora','Η Χριστίνα mio εξήγησε che η totale μένει αλλά αλλάζει μορφή'],
+keyConcept:'<strong>Divario:</strong> «energia διατηρείται» (αληθές αλλά ελλιπές) vs «μηχανική energia diminuisce σε ανελαστικές κρούσεις» (πλήρες). Η βαθιά comprensione ξεχωρίζει τα είδη energia.',
+funFact:'🏀 Μια μπάλα μπάσκετ χάνει ~20% energia σε ogni αναπήδηση — γι\' questo serve συνεχές ντρίπλαρισμα!'},
+{tag:'Quantistica',question:'Αν αυξήσεις molto τη φωτεινότητα (intensità) κόκκινου della luce sopra σε μέταλλο, θα βγάλει elettroni;',
+svg:'<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg"><rect width="560" height="260" fill="#111827" rx="14"/><rect x="260" y="60" width="80" height="140" rx="8" fill="#222e50" stroke="#7a8baa" stroke-width="2"/><text x="300" y="218" text-anchor="middle" fill="#7a8baa" font-size="10">μέταλλο (W=2eV)</text><circle cx="90" cy="100" r="30" fill="#ff4757" opacity=".4"/><text x="90" y="106" text-anchor="middle" fill="#ff4757" font-size="14">🔴</text><text x="90" y="148" text-anchor="middle" fill="#ff4757" font-size="8">κόκκινο (E=1.8eV/fotone)</text><text x="90" y="160" text-anchor="middle" fill="#ff4757" font-size="8" font-weight="700">ΠΟΛΥ φωτεινό</text><line x1="125" y1="90" x2="255" y2="100" stroke="#ff4757" stroke-width="2"/><line x1="125" y1="105" x2="255" y2="115" stroke="#ff4757" stroke-width="2"/><line x1="125" y1="120" x2="255" y2="130" stroke="#ff4757" stroke-width="2"/></svg>',
+opts:[{label:'Α',text:'Ναι — basta molto δυνατό luce'},{label:'Β',text:'Όχι — η frequenza (χρώμα) è che μετράει, όχι η φωτεινότητα'},{label:'Γ',text:'Ναι — αν περιμένεις αρκετά'}],
+correct:1,
+viewpoints:[
+  {name:'Θανάσης',avatar:'🧑‍🎓',text:'Αν βάλεις molto δυνατό luce, η energia basta σίγουρα.',type:'surface',eval:'Επιφανειακή'},
+  {name:'Κατερίνα',avatar:'👩‍💻',text:'Νομίζω che το χρώμα παίζει ρόλο, αλλά non so perché ακριβώς η intensità non basta.',type:'partial',eval:'Μερικώς corretta'},
+  {name:'Ανδρέας',avatar:'🧑‍🔬',text:'Κάθε fotone μεταφέρει E=hf. Αν f<soglia, κανένα μεμονωμένο fotone non φτάνει per «ξεκλείδωμα». Η intensità = αριθμός φωτονίων, αλλά κανένα non ξεπερνά το W.',type:'deep',eval:'Βαθιά comprensione'}
+],
+reviseKw:['fotone','hf','soglia','frequenza','intensità','αριθμός','energia ανά','κβαντ'],
+reviseExplain:'Η intensità = αριθμός φωτονίων. Αν ogni fotone ha E=1.8eV < W=2eV, ΟΧΙ elettroni — ό,τι intensità κι αν βάλεις.',
+reflectOptions:['Ήξερα che η intensità ≠ energia ανά fotone','Πίστευα «molto luce = basta» — ora καταλαβαίνω che μετράει η energia ΚΑΘΕ φωτονίου','Χρειάζομαι περισσότερη μελέτη','Ο Ανδρέας mio έδειξε che intensità = αριθμός, ΟΧΙ energia ανά fotone'],
+keyConcept:'<strong>Divario:</strong> «molto luce = πολλή energia» (κλασικό modello) vs «energia = hf ανά fotone» (κβαντικό). Questo ακριβώς non μπορούσε να εξηγήσει η κλασική fisica!',
+funFact:'🏆 Ο Einstein πήρε Nobel Φυσικής (1921) γι\' questo ακριβώς — ΟΧΙ per τη σχετικότητα!'}
+];
+
+let cur=0,pts=0,gaps=0,shifts=0,commitChoice=null,reviseChoice=null,reflectChoice=null,vpEvals={},results=[];
+function startGioco(){document.getElementById('intro').classList.add('hidden');document.getElementById('gameScreen').classList.remove('hidden');init()}
+function init(){cur=0;pts=0;gaps=0;shifts=0;commitChoice=null;reviseChoice=null;reflectChoice=null;vpEvals={};results=[];document.getElementById('resCard').classList.add('hidden');document.getElementById('gameArea').classList.remove('hidden');buildSteps();loadScenario()}
+function buildSteps(){const c=document.getElementById('steps');c.innerHTML='';DATA.forEach((d,i)=>{const s=document.createElement('div');s.className='sp'+(i===0?' on':'');s.id='st'+i;s.innerHTML='<span class="n">'+(i+1)+'</span>'+d.tag;c.appendChild(s)})}
+function updateSteps(){DATA.forEach((_,i)=>{document.getElementById('st'+i).className='sp'+(i<cur?' ok':(i===cur?' on':''))})}
+function updatePipeline(idx){for(let i=0;i<4;i++)document.getElementById('pipe'+i).className='pipe-step'+(i<idx?' done':(i===idx?' active':''))}
+function updateTop(){document.getElementById('score').textContent=pts;document.getElementById('snum').textContent=(cur+1)+'/5';document.getElementById('pfill').style.width=(cur/5*100)+'%';const gb=document.getElementById('gapBadge'),gn=document.getElementById('gapNum');if(gaps>0){gb.classList.remove('hidden');gn.textContent=gaps}else gb.classList.add('hidden')}
+
+function loadScenario(){
+  const d=DATA[cur];commitChoice=null;reviseChoice=null;reflectChoice=null;vpEvals={};
+  document.getElementById('sceneTag').textContent=d.tag;
+  document.getElementById('sceneImg').innerHTML=d.svg;
+  document.getElementById('gapQ').textContent=d.question;
+  updatePipeline(0);updateTop();updateSteps();
+  ['phCommit','phNegotiate','phRivedi','phRifletti'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById('phCommit').classList.add('on');
+  // Build commit choices
+  const cg=document.getElementById('commitGrid');cg.innerHTML='';
+  d.opts.forEach((o,i)=>{const c=document.createElement('div');c.className='opt-card';c.innerHTML='<div class="opt-label">'+o.label+'</div>'+o.text;c.onclick=()=>{commitChoice=i;cg.querySelectorAll('.opt-card').forEach((el,idx)=>el.classList.toggle('sel',idx===i))};cg.appendChild(c)});
+  // Reset
+  ['fbCommit','fbNeg','fbRivedi','fbRifletti'].forEach(id=>{const el=document.getElementById(id);el.className='fb';el.style.display='none'});
+  document.getElementById('viewpoints').innerHTML='';document.getElementById('reviseGrid').innerHTML='';document.getElementById('reflectGrid').innerHTML='';
+  document.getElementById('reviseText').value='';
+  document.getElementById('nextRow').classList.add('hidden');
+  ['keyConcept','funFact'].forEach(id=>{document.getElementById(id).className=id==='keyConcept'?'key-concept':'fun-fact';document.getElementById(id).style.display='none'});
+  document.getElementById('mainCard').classList.remove('shake');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function submitCommit(){
+  if(commitChoice===null){showFb('fbCommit','tip','Prendi posizione πρώτα!');return}
+  const d=DATA[cur];
+  if(commitChoice===d.correct){flash('green');showFb('fbCommit','good','Ωραία επιλογή! Αλλά μη χαλαρώνεις — ora δες τι λένε οι «συμμαθητές» tuo.')}
+  else{flash('purple');showFb('fbCommit','inf','Ενδιαφέρουσα posizione! Ora δες τι σκέφτονται άλλοι — μήπως αλλάξεις γνώμη;')}
+  setTimeout(()=>{updatePipeline(1);document.getElementById('phCommit').classList.remove('on');document.getElementById('phNegotiate').classList.add('on');buildViewpoints()},1100)
+}
+
+function buildViewpoints(){
+  const d=DATA[cur],vp=document.getElementById('viewpoints');vp.innerHTML='';
+  d.viewpoints.forEach((v,i)=>{
+    const div=document.createElement('div');div.className='viewpoint';
+    div.innerHTML='<div class="vp-name"><div class="avatar" style="background:var(--s3)">'+v.avatar+'</div>'+v.name+'</div><div class="vp-text">«'+v.text+'»</div><div class="vp-eval"><button class="vp-btn" onclick="evalVP('+i+',\'surface\')">Επιφανειακή</button><button class="vp-btn" onclick="evalVP('+i+',\'partial\')">Μερικώς corretta</button><button class="vp-btn" onclick="evalVP('+i+',\'deep\')">Βαθιά comprensione</button></div>';
+    vp.appendChild(div)
+  })
+}
+function evalVP(idx,val){
+  vpEvals[idx]=val;
+  const btns=document.querySelectorAll('#viewpoints .viewpoint')[idx].querySelectorAll('.vp-btn');
+  btns.forEach(b=>{b.classList.remove('chosen');if(b.textContent.toLowerCase().includes(val==='surface'?'επιφαν':val==='partial'?'μερικ':'βαθι'))b.classList.add('chosen')})
+}
+function submitNegotiate(){
+  if(Object.keys(vpEvals).length<3){showFb('fbNeg','tip','Αξιολόγησε e le 3 απόψεις prima συνεχίσεις!');return}
+  const d=DATA[cur];let correctEvals=0;
+  d.viewpoints.forEach((v,i)=>{if(vpEvals[i]===v.type)correctEvals++});
+  // Rivelazione correct types
+  document.querySelectorAll('#viewpoints .viewpoint').forEach((div,i)=>{
+    const v=d.viewpoints[i];div.classList.add('vp-'+v.type);
+    const tag=document.createElement('span');tag.className='vp-tag';tag.textContent=v.eval;div.appendChild(tag);
+    div.querySelectorAll('.vp-btn').forEach(b=>b.disabled=true)
+  });
+  if(correctEvals===3){pts+=2;showFb('fbNeg','good','Τέλεια αξιολόγηση! Ξεχώρισες επιφανειακή, μερική e βαθιά comprensione. +2')}
+  else if(correctEvals>=2){pts+=1;showFb('fbNeg','inf',correctEvals+'/3 σωστές αξιολογήσεις. +1')}
+  else{showFb('fbNeg','wrong','Μόνο '+correctEvals+'/3. Πρόσεξε τα χρωματιστά tags — δείχνουν τη corretta αξιολόγηση.')}
+  updateTop();
+  setTimeout(()=>{updatePipeline(2);document.getElementById('phNegotiate').classList.remove('on');document.getElementById('phRivedi').classList.add('on');buildRivedi()},1300)
+}
+
+function buildRivedi(){
+  const d=DATA[cur],rg=document.getElementById('reviseGrid');rg.innerHTML='';
+  d.opts.forEach((o,i)=>{const c=document.createElement('div');c.className='opt-card';c.innerHTML='<div class="opt-label">'+o.label+'</div>'+o.text;c.onclick=()=>{reviseChoice=i;rg.querySelectorAll('.opt-card').forEach((el,idx)=>el.classList.toggle('sel',idx===i))};rg.appendChild(c)})
+}
+function submitRivedi(){
+  if(reviseChoice===null){showFb('fbRivedi','tip','Scegli risposta!');return}
+  const d=DATA[cur],txt=document.getElementById('reviseText').value.trim().toLowerCase();
+  if(txt.length<15){showFb('fbRivedi','tip','Εξήγησε perché σε almeno 2 προτάσεις.');return}
+  const shifted=commitChoice!==d.correct&&reviseChoice===d.correct;
+  let hits=0;d.reviseKw.forEach(k=>{if(txt.includes(k.toLowerCase()))hits++});
+  document.querySelectorAll('#reviseGrid .opt-card').forEach((el,i)=>{el.style.pointerEvents='none';if(i===d.correct)el.classList.add('right');else if(i===reviseChoice&&i!==d.correct)el.classList.add('wrong')});
+  if(reviseChoice===d.correct){
+    pts+=2;gaps++;
+    if(shifted){shifts++;pts+=1;flash('purple');showFb('fbRivedi','good','🌉 <strong>Gap bridged + Mind shift!</strong> Άλλαξες corretto τη posizione tuo dopo τη «discussione». +3')}
+    else{flash('green');showFb('fbRivedi','good','Σωστή risposta! +2<br><br>'+d.reviseExplain)}
+  }else{flash('red');showFb('fbRivedi','wrong','Λάθος. '+d.reviseExplain)}
+  updateTop();
+  setTimeout(()=>{updatePipeline(3);document.getElementById('phRivedi').classList.remove('on');document.getElementById('phRifletti').classList.add('on');buildRifletti()},1300)
+}
+
+function buildRifletti(){
+  const d=DATA[cur],rg=document.getElementById('reflectGrid');rg.innerHTML='';
+  d.reflectOptions.forEach((o,i)=>{const c=document.createElement('div');c.className='ref-card';c.textContent=o;c.onclick=()=>{reflectChoice=i;rg.querySelectorAll('.ref-card').forEach((el,idx)=>el.classList.toggle('sel',idx===i))};rg.appendChild(c)})
+}
+function submitRifletti(){
+  if(reflectChoice===null){showFb('fbRifletti','tip','Scegli una αντανάκλαση!');return}
+  pts+=1;flash('green');
+  showFb('fbRifletti','good','Μπράβο che αναστοχάστηκες! Ο στοχασμός sopra nella διαδικασία pensiero (μεταconoscenza) è κλειδί per τη βαθιά μάθηση. +1');
+  const d=DATA[cur];
+  const r={tag:d.tag,correct:reviseChoice===d.correct,shifted:commitChoice!==d.correct&&reviseChoice===d.correct};results.push(r);
+  updateTop();
+  const kc=document.getElementById('keyConcept');kc.innerHTML=d.keyConcept;kc.className='key-concept vis';kc.style.display='block';
+  const ff=document.getElementById('funFact');ff.innerHTML=d.funFact;ff.className='fun-fact vis';ff.style.display='block';
+  document.getElementById('nextRow').classList.remove('hidden');
+  launchConfetti(40);aniC()
+}
+
+function nextScenario(){cur++;if(cur>=DATA.length)showResults();else loadScenario()}
+function showResults(){
+  document.getElementById('gameArea').classList.add('hidden');document.getElementById('resCard').classList.remove('hidden');
+  document.getElementById('pfill').style.width='100%';document.getElementById('snum').textContent='5/5';
+  document.getElementById('resBig').textContent=gaps+'/5';document.getElementById('resPts').textContent=pts;
+  document.getElementById('resGaps').textContent=gaps;document.getElementById('resShifts').textContent=shifts;
+  const bd=document.getElementById('breakdown');bd.innerHTML='<h3>Ανά scenario</h3>';
+  results.forEach(r=>{const row=document.createElement('div');row.className='bd-row';row.innerHTML='<span class="bd-topic">'+r.tag+'</span><span class="bd-r '+(r.correct?'ok':'fail')+'">'+(r.correct?'✓ Γεφυρωμένο':'✗ Ανοιχτό')+'</span>'+(r.shifted?'<span class="bd-r shift">🌉 Mind shift!</span>':'');bd.appendChild(row)});
+  let msg='';
+  if(gaps===5&&shifts>=2)msg='Εξαιρετικό! Γεφύρωσες ΟΛΑ τα χάσματα e αναθεώρησες davvero τη pensiero tuo. Questoς è ο κύκλος βαθιάς μάθησης!';
+  else if(gaps>=4)msg='Πολύ καλά! Η «discussione» με li συμμαθητές σε βοήθησε να δεις più βαθιά.';
+  else if(gaps>=2)msg='Buona αρχή! Κάποια χάσματα έμειναν ανοιχτά — δοκίμασε ξανά!';
+  else msg='Τα χάσματα è πεισματάρια — αλλά ο κύκλος Δέσμευση→Διαπραγμάτευση→Αναδόμηση→Στοχασμός θα σε βοηθήσει!';
+  document.getElementById('resMsg').textContent=msg;
+  DATA.forEach((_,i)=>document.getElementById('st'+i).className='sp ok');
+  launchConfetti(gaps>=4?120:40);aniC()
+}
+function restart(){init()}
+function showFb(id,type,msg){const el=document.getElementById(id);el.className='fb vis '+type;el.style.display='block';el.innerHTML=msg}
+</script>
+</body>
+</html>
